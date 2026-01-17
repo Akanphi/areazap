@@ -8,7 +8,6 @@ const AlertPop = ({ message, onClose, isVisible, autoHideDuration = 2000 }: Aler
   
   // This handles the "Auto Hide" logic
   useEffect(() => {
-    console.log("ok");
     if (isVisible && autoHideDuration > 0) {
       const timer = setTimeout(() => {
         onClose();

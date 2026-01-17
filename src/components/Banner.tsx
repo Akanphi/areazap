@@ -25,7 +25,7 @@ export const Banner = () => {
 
                 <section className="hidden lg:flex gap-2 text-base font-medium">
                     <Link
-                        href="/demonstrations"
+                        href="/how-it-works"
                         className="px-4 py-2 rounded-lg hover:bg-stone-200 transition-colors"
                     >
                         How it works

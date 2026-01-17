@@ -1,5 +1,14 @@
 import api from './api';
 
+export interface ExternalService {
+    id: string;
+    name: string;
+    slug: string;
+    auth_type: string;
+    logo_url: string | null;
+    capabilities: Record<string, any>;
+}
+
 export interface ServiceAccount {
     id: string;
     display_name: string;
@@ -38,8 +47,26 @@ export interface PatchServiceAccountPayload {
  * GET /area_api/service-accounts/
  */
 export const getServiceAccounts = async (): Promise<ServiceAccount[]> => {
+    console.log(">>> FETCHING service-accounts");
     const response = await api.get<ServiceAccount[]>('service-accounts/');
+    console.log(">>> RECEIVED service-accounts:", response.data);
     return response.data;
+};
+
+/**
+ * Returns the list of external services connected by the user.
+ * GET /area_api/auth/external-services/
+ */
+export const getConnectedServices = async (): Promise<ExternalService[]> => {
+    console.log(">>> FETCHING connectedServices (auth/external-services/)");
+    try {
+        const response = await api.get<ExternalService[]>('auth/external-services/');
+        console.log("connectedServices - BACKEND RETURN:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("connectedServices - ERROR:", error);
+        throw error;
+    }
 };
 
 /**

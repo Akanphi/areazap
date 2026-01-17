@@ -24,7 +24,7 @@ import { getExternalServices, getServiceDefinitions, getGithubRepos, getGitlabPr
 import { getTriggerConfig } from "@/api/triggers";
 import { createAreaTrigger, authorizeAreaTrigger, patchAreaTrigger, deleteAreaTrigger } from "@/api/areaTriggers";
 import { createAreaAction, authorizeAreaAction, patchAreaAction, deleteAreaAction } from "@/api/areaActions";
-import { getServiceAccounts, ServiceAccount } from "@/api/serviceAccounts";
+import { getServiceAccounts, ServiceAccount, getConnectedServices } from "@/api/serviceAccounts";
 import { ExternalService, TriggerDefinition, ActionDefinition, ServiceDefinition, TriggerConfig, FieldDefinition, FieldChoice } from "@/types/api";
 import { ConfigField, ConfigMap } from "@/api/configMap";
 // Disable static generation for this page
@@ -157,6 +157,7 @@ function ZapsEditorContent() {
     const [isLoadingServices, setIsLoadingServices] = useState(false);
     const [dynamicFieldOptions, setDynamicFieldOptions] = useState<Record<string, FieldChoice[]>>({});
     const [serviceAccounts, setServiceAccounts] = useState<ServiceAccount[]>([]);
+    const [connectedServices, setConnectedServices] = useState<ExternalService[]>([]);
 
     // Consent State
     const [consentModal, setConsentModal] = useState<{ isOpen: boolean; serviceSlug: string; stepId: string }>({
@@ -185,12 +186,14 @@ function ZapsEditorContent() {
         const fetchData = async () => {
             setIsLoadingServices(true);
             try {
-                const [servicesData, accountsData] = await Promise.all([
+                const [servicesData, accountsData, connectedData] = await Promise.all([
                     getExternalServices(),
-                    getServiceAccounts()
+                    getServiceAccounts(),
+                    getConnectedServices()
                 ]);
                 setServices(servicesData);
                 setServiceAccounts(accountsData);
+                setConnectedServices(connectedData);
             } catch (error) {
                 console.error("Failed to fetch initial data:", error);
                 showAlert("Failed to load services or accounts.");
@@ -328,8 +331,14 @@ function ZapsEditorContent() {
                 const currentStep = steps.find(s => s.isExpanded);
                 if (currentStep) {
                     fetchDynamicData(currentStep.app);
-                    // Refresh service accounts
-                    getServiceAccounts().then(setServiceAccounts).catch(console.error);
+                    // Refresh service accounts and connected services
+                    Promise.all([
+                        getServiceAccounts(),
+                        getConnectedServices()
+                    ]).then(([accounts, connected]) => {
+                        setServiceAccounts(accounts);
+                        setConnectedServices(connected);
+                    }).catch(console.error);
                     // Mark step as validated if it was waiting for auth
                     if (!currentStep.isValidated && currentStep.createdId) {
                         updateStep(currentStep.id, { isValidated: true });
@@ -423,11 +432,45 @@ function ZapsEditorContent() {
     };
 
     const handleAppChange = async (stepId: string, appSlug: string) => {
-        // Open consent modal instead of immediately updating
-        setConsentModal({
-            isOpen: true,
-            serviceSlug: appSlug,
-            stepId: stepId
+        // Check if service is already connected
+        const isConnected = connectedServices.some(s => s.slug.toLowerCase() === appSlug.toLowerCase());
+
+        if (isConnected) {
+            console.log(`Service ${appSlug} is already connected, skipping consent modal.`);
+            await proceedWithService(stepId, appSlug);
+        } else {
+            // Open consent modal
+            setConsentModal({
+                isOpen: true,
+                serviceSlug: appSlug,
+                stepId: stepId
+            });
+        }
+    };
+
+    const proceedWithService = async (stepId: string, serviceSlug: string) => {
+        updateStep(stepId, {
+            app: serviceSlug,
+            event: "",
+            isExpanded: true,
+            isCheckingAuth: true,
+            isConnected: false,
+            isValidated: false,
+            config: {}
+        });
+
+        // Fetch definitions for the selected service
+        if (!serviceDefinitions[serviceSlug]) {
+            const definitions = await getServiceDefinitions(serviceSlug);
+            console.log("Fetched definitions for", serviceSlug, ":", definitions);
+            setServiceDefinitions(prev => ({ ...prev, [serviceSlug]: definitions }));
+        } else {
+            console.log("Using cached definitions for", serviceSlug, ":", serviceDefinitions[serviceSlug]);
+        }
+
+        updateStep(stepId, {
+            isCheckingAuth: false,
+            isConnected: true
         });
     };
 
@@ -437,37 +480,11 @@ function ZapsEditorContent() {
 
         if (!serviceSlug || !stepId) return;
 
-        const proceedWithService = async () => {
-            updateStep(stepId, {
-                app: serviceSlug,
-                event: "",
-                isExpanded: true,
-                isCheckingAuth: true,
-                isConnected: false,
-                isValidated: false,
-                config: {}
-            });
-
-            // Fetch definitions for the selected service
-            if (!serviceDefinitions[serviceSlug]) {
-                const definitions = await getServiceDefinitions(serviceSlug);
-                console.log("Fetched definitions for", serviceSlug, ":", definitions);
-                setServiceDefinitions(prev => ({ ...prev, [serviceSlug]: definitions }));
-            } else {
-                console.log("Using cached definitions for", serviceSlug, ":", serviceDefinitions[serviceSlug]);
-            }
-
-            updateStep(stepId, {
-                isCheckingAuth: false,
-                isConnected: true
-            });
-        };
-
         try {
             console.log(`Requesting consent for ${serviceSlug}...`);
 
             if (serviceSlug === "google") {
-                await proceedWithService();
+                await proceedWithService(stepId, serviceSlug);
                 return;
             }
 
@@ -475,7 +492,7 @@ function ZapsEditorContent() {
             console.log("Consent response:", response);
 
             if (response.is_authenticated) {
-                await proceedWithService();
+                await proceedWithService(stepId, serviceSlug);
             } else if (response.authorization_url) {
                 // Redirect to auth url
                 window.open(response.authorization_url, '_blank');
@@ -806,7 +823,7 @@ function ZapsEditorContent() {
         if (!serviceDef) return eventSlug;
         const list = type === "trigger" ? serviceDef.triggers : serviceDef.actions;
         const item = list.find(i => i.slug === eventSlug);
-        return item?.name || eventSlug;
+        return item?.description || item?.name || eventSlug;
     };
 
     const mapKeyToField = (step: Step, key: string, required: boolean): FieldDefinition => {
@@ -1063,9 +1080,8 @@ function ZapsEditorContent() {
                                                                     key={t.slug}
                                                                     value={t.slug}
                                                                     style={{ color: '#111827', backgroundColor: '#ffffff' }}
-
                                                                 >
-                                                                    {t.name || t.slug}
+                                                                    {t.description || t.name || t.slug}
                                                                 </option>
                                                             ))
                                                             : serviceDefinitions[step.app].actions.map((a: ActionDefinition) => (
@@ -1074,7 +1090,7 @@ function ZapsEditorContent() {
                                                                     value={a.slug}
                                                                     style={{ color: '#111827', backgroundColor: '#ffffff' }}
                                                                 >
-                                                                    {a.name || a.slug}
+                                                                    {a.description || a.name || a.slug}
                                                                 </option>
                                                             ))
                                                     )}
@@ -1135,16 +1151,14 @@ function ZapsEditorContent() {
                                                                 </div>
                                                             )}
 
-                                                            {!step.isValidated && (
-                                                                <button
-                                                                    onClick={() => step.type === "trigger" ? handleValidateTrigger(step.id) : handleValidateAction(step.id)}
-                                                                    disabled={step.isValidating || step.isCreating || step.isCheckingAuth}
-                                                                    className="w-full mt-4 px-6 py-3 bg-[#07BB9C] text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                                                                >
-                                                                    {step.isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
-                                                                    Validate {step.type === "trigger" ? "Trigger" : "Action"}
-                                                                </button>
-                                                            )}
+                                                            <button
+                                                                onClick={() => step.type === "trigger" ? handleValidateTrigger(step.id) : handleValidateAction(step.id)}
+                                                                disabled={step.isValidating || step.isCreating || step.isCheckingAuth}
+                                                                className="w-full mt-4 px-6 py-3 bg-[#07BB9C] text-white rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                                            >
+                                                                {step.isValidating ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                                                                {step.isValidated ? "Re-validate" : "Validate"} {step.type === "trigger" ? "Trigger" : "Action"}
+                                                            </button>
                                                         </div>
                                                     );
                                                 })()}

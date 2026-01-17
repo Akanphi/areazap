@@ -89,7 +89,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initAuth();
     }, []);
 
-    // Optional: Protect routes
     useEffect(() => {
         const publicRoutes = [
             '/',
@@ -103,7 +102,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             '/help',
             '/dev-platform',
             '/terms',
-            '/privacy'
+            '/privacy',
+            '/how-it-works'
         ];
         if (!isLoading && !user && !publicRoutes.includes(pathname)) {
             router.push('/login');

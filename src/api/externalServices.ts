@@ -14,7 +14,9 @@ export interface ExternalService {
  * GET /area_api/auth/external-services/
  */
 export const getConnectedServices = async (): Promise<ExternalService[]> => {
+    console.log("API: Fetching connected services from externalServices.ts...");
     const response = await api.get<ExternalService[]>('auth/external-services/');
+    console.log("API: Connected services response:", response.data);
     return response.data;
 };
 
