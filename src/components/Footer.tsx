@@ -1,3 +1,4 @@
+"use client";
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import YouTubeIcon from '@mui/icons-material/YouTube';

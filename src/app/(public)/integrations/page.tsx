@@ -9,9 +9,9 @@ const INTEGRATIONS = [
     { name: 'Slack', icon: '/slack.svg', desc: 'Send messages and manage channels.' },
     { name: 'Discord', icon: '/discord.svg', desc: 'Manage your community servers.' },
     { name: 'Telegram', icon: '/telegram.svg', desc: 'Build bots and automate chats.' },
-    { name: 'Notion', icon: '/notion.png', desc: 'Organize your workspace automatically.' }, // Assuming icon exists or fallback
-    { name: 'Trello', icon: '/trello.png', desc: 'Manage projects and tasks.' }, // Assuming icon exists or fallback
-    { name: 'Spotify', icon: '/spotify.png', desc: 'Control your music and playlists.' }, // Assuming icon exists or fallback
+    { name: 'Notion', icon: '/notion.svg', desc: 'Organize your workspace automatically.' },
+    { name: 'Trello', icon: '/trello.svg', desc: 'Manage projects and tasks.' },
+    { name: 'Spotify', icon: '/spotify.svg', desc: 'Control your music and playlists.' },
 ];
 
 export default function IntegrationsPage() {
@@ -35,8 +35,7 @@ export default function IntegrationsPage() {
                                     fill
                                     className="object-contain"
                                     onError={(e) => {
-                                        // Fallback if image missing
-                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/48?text=" + app.name[0];
+                                        
                                     }}
                                 />
                             </div>
@@ -46,16 +45,16 @@ export default function IntegrationsPage() {
                     ))}
                 </div>
 
-                <div className="mt-16 text-center bg-purple-600 rounded-2xl p-12 text-white">
+                <div className="mt-16 text-center bg-[#f66d32] rounded-2xl p-12 text-white">
                     <h2 className="text-3xl font-bold mb-4">Don't see your app?</h2>
                     <p className="text-purple-100 mb-8 max-w-xl mx-auto">
                         We're constantly adding new integrations. You can build your own using our Developer Platform or request a new integration.
                     </p>
-                    <div className="flex justify-center gap-4">
-                        <button className="px-6 py-3 bg-white text-purple-600 rounded-xl font-bold hover:bg-gray-100 transition-colors">
+                    <div className="flex justify-center gap-4 ">
+                        <button className="px-6 py-3 bg-white cursor-pointer text-purple-600 rounded-xl font-bold hover:bg-gray-100 transition-colors">
                             Build Integration
                         </button>
-                        <button className="px-6 py-3 bg-purple-700 text-white rounded-xl font-bold hover:bg-purple-800 transition-colors border border-purple-500">
+                        <button className="px-6 py-3 cursor-pointer bg-purple-700 text-white rounded-xl font-bold hover:bg-purple-800 transition-colors border border-purple-500">
                             Request App
                         </button>
                     </div>

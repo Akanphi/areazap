@@ -146,7 +146,7 @@ export default function ServicesPage() {
                             >
                                 {/* Service Header */}
                                 <div
-                                    className={`h-32 bg-gradient-to-br ${service.color} flex items-center justify-center relative`}
+                                    className={`h-32 bg-linear-to-br ${service.color} flex items-center justify-center relative`}
                                 >
                                     <div className="absolute top-4 right-4">
                                         {connectedAccount ? (
