@@ -91,7 +91,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Optional: Protect routes
     useEffect(() => {
-        const publicRoutes = ['/login', '/register', '/verify-email', '/', '/reset-password'];
+        const publicRoutes = [
+            '/',
+            '/login',
+            '/register',
+            '/verify-email',
+            '/reset-password',
+            '/pricing',
+            '/about-us',
+            '/integrations',
+            '/help',
+            '/dev-platform',
+            '/terms',
+            '/privacy'
+        ];
         if (!isLoading && !user && !publicRoutes.includes(pathname)) {
             router.push('/login');
         }
