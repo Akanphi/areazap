@@ -17,12 +17,20 @@ export default function AdminDashboard() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [areasData] = await Promise.all([
-          getAreas(),
-          // getAreaRuns()
-        ]);
+
+        // Fetch areas first
+        const areasData = await getAreas();
         setAreas(areasData);
-        setAreaRuns([]);
+
+        // Try to fetch area runs, but don't fail if it errors
+        try {
+          const runsData = await getAreaRuns();
+          setAreaRuns(runsData);
+        } catch (runsError) {
+          console.warn("Failed to fetch area runs (using empty array):", runsError);
+          setAreaRuns([]);
+        }
+
         setError(null);
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
@@ -128,24 +136,27 @@ export default function AdminDashboard() {
   const executionsByApp = useMemo(() => {
     const appCounts: Record<string, number> = {};
 
-    areaRuns.forEach(run => {
-      const area = areas.find(a => a.id === run.area_id);
-      if (area && area.triggers.length > 0) {
+    // Use runs_count from areas instead of fetching area runs
+    areas.forEach(area => {
+      if (area.triggers.length > 0) {
         const service = area.triggers[0].external_service;
-        appCounts[service] = (appCounts[service] || 0) + 1;
+        appCounts[service] = (appCounts[service] || 0) + (area.runs_count || 0);
       }
     });
 
-    const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088fe"];
+    const total = Object.values(appCounts).reduce((sum, count) => sum + count, 0);
+    const colors = ["#fc6d26", "#00B1B0", "#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#ef4444"];
+
     return Object.entries(appCounts)
       .map(([name, value], index) => ({
-        name,
+        name: name.charAt(0).toUpperCase() + name.slice(1),
         value,
+        percentage: total > 0 ? ((value / total) * 100).toFixed(1) : "0",
         color: colors[index % colors.length]
       }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
-  }, [areas, areaRuns]);
+  }, [areas]);
 
   const zapsByCategory = useMemo(() => {
     const categoryCounts: Record<string, { count: number, executions: number }> = {};
@@ -382,28 +393,47 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
           </div>
 
-          {/* Executions by App */}
+          {/* Executions by Service */}
           <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Executions by App</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={executionsByApp} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" tickFormatter={formatNumber} tick={{ fontSize: 12 }} />
-                <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={100} />
-                <Tooltip
-                  formatter={(value) => {
-                    const v = typeof value === "number" ? value : 0;
-                    return [formatNumber(v), "Executions"] as const;
-                  }}
-                  labelFormatter={(label) => `App: ${label}`}
-                />
-                <Bar dataKey="value" radius={[0, 8, 8, 0]}>
-                  {executionsByApp.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Executions by Service</h3>
+            {executionsByApp.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={executionsByApp}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={(entry: any) => {
+                      const dataEntry = executionsByApp.find(item => item.name === entry.name);
+                      return dataEntry ? `${dataEntry.name}: ${dataEntry.percentage}%` : '';
+                    }}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {executionsByApp.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value) => {
+                      const v = typeof value === "number" ? value : 0;
+                      return [formatNumber(v), "Executions"] as const;
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    formatter={(value, entry: any) => `${value} (${entry.payload.percentage}%)`}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-gray-400">
+                <p>No execution data available</p>
+              </div>
+            )}
           </div>
         </div>
 

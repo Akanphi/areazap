@@ -53,7 +53,7 @@ const menuItems: MenuItem[] = [
         visible: ["Admin", "User"],
     },
     {
-        icon: "/settings.png",
+        icon: "/services.png",
         label: "Services",
         href: "/services",
         visible: ["Admin", "User"],

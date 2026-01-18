@@ -70,6 +70,14 @@ export default function ZapsManagerPage() {
                 setIsLoading(true);
                 const data = await getAreas();
                 setAreas(data);
+
+                // Log each area details
+                console.log("--- Fetched Areas Details ---");
+                data.forEach((area, index) => {
+                    console.log(`Area ${index + 1}:`, area);
+                });
+                console.log("-----------------------------");
+
                 setError(null);
             } catch (err: any) {
                 console.error("Failed to fetch areas:", err);

@@ -9,6 +9,14 @@ interface AreaDetailsModalProps {
 }
 
 export default function AreaDetailsModal({ isOpen, onClose, area }: AreaDetailsModalProps) {
+    React.useEffect(() => {
+        if (isOpen && area) {
+            console.log("--- Selected Area Details ---");
+            console.log(area);
+            console.log("-----------------------------");
+        }
+    }, [isOpen, area]);
+
     if (!isOpen || !area) return null;
 
     const getStatusColor = (status: string) => {

@@ -16,6 +16,7 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   fallback: ReactNode;
+  allValues: Record<string, any>;
 }
 
 // Configuration centralisée des endpoints
@@ -26,6 +27,8 @@ export type SelectOption = {
 
 type EndpointConfig = {
   endpoint: string;
+  parameter?: string;
+  dependency?: string;
   transformResponse?: (data: any) => SelectOption[];
 };
 
@@ -33,59 +36,174 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
   trigger: {
     github: {
       repository: {
-        endpoint: "/github/repos/",
+        endpoint: "github/repos/",
         transformResponse: (data: any) => (data.repos || []).map((repo: string) => ({ label: repo, value: repo }))
+      },
+      issue_number: {
+        endpoint: "github/user/issues/",
+        parameter: "repo_full_name",
+        dependency: "repository",
+        transformResponse: (data: any) => (data.issues || []).map((issue: string) => ({ label: issue, value: issue }))
+      },
+      events: {
+        endpoint: "github/webhooks/create/possible_events/",
+        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((e: string) => ({ label: e, value: e }))
+      },
+      branch: {
+        endpoint: "github/branches/",
+        parameter: "repo_full_name",
+        dependency: "repository"
+      },
+      pulls: {
+        endpoint: "github/user/pulls/",
+        parameter: "repo_full_name",
+        dependency: "repository"
+      },
+      assignees: {
+        endpoint: "github/assignees/",
+        parameter: "repo_full_name",
+        dependency: "repository",
+        transformResponse: (data: any) => (data.assignees || []).map((u: string) => ({ label: u, value: u }))
       },
     },
     gitlab: {
       project_id: {
-        endpoint: "/gitlab/projects/",
-        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((p: any) => ({
-          label: p.name || p.id?.toString() || p.toString(),
-          value: p.id?.toString() || p.toString()
-        }))
+        endpoint: "gitlab/projects/",
+        transformResponse: (data: any) => {
+          const projects = Array.isArray(data) ? data : (data.projects || data.repos || []);
+          return projects.map((p: any) => ({
+            label: p.path_with_namespace || p.name || p.id?.toString() || p.toString(),
+            value: p.id?.toString() || p.toString()
+          }));
+        }
+      },
+      merge_request_iid: {
+          endpoint: "gitlab/user/merge-requests/",
+          parameter: "project_id",
+          dependency: "project_id",
+          transformResponse: (data: any) => (data.merge_requests || []).map((mr: string) => ({ label: mr, value: mr }))
+      },
+      branch: {
+        endpoint: "gitlab/user/branches/",
+        parameter: "project_id",
+        dependency: "project_id",
+        transformResponse: (data: any) => (data.branches || []).map((c: any) => ({ label: c, value:  c}))
+      },
+      issue_iid: { 
+        endpoint: "gitlab/user/issues/",
+        parameter: "project_id",
+        dependency: "project_id",
+        transformResponse: (data: any) => (data.issues || []).map((issue: string) => ({ label: issue, value: issue }))
+      },
+      events: {
+        endpoint: "gitlab/webhooks/create/possible_events/",
+        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((e: string) => ({ label: e, value: e }))
+      },
+      assignee: {
+        endpoint: "gitlab/users/",
+        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((u: any) => ({ label: u.login || u, value: u.login || u }))
       },
     },
   },
   action: {
     github: {
       repository: {
-        endpoint: "/github/repos/",
+        endpoint: "github/repos/",
         transformResponse: (data: any) => (data.repos || []).map((repo: string) => ({ label: repo, value: repo }))
       },
-      assignee: {
-        endpoint: "/github/users/",
-        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((u: any) => ({ label: u.login || u, value: u.login || u }))
+      assignees: {
+        endpoint: "github/assignees/",
+        parameter: "repo_full_name",
+        dependency: "repository",
+        transformResponse: (data: any) => (data.assignees || []).map((u: string) => ({ label: u, value: u }))
       },
-      issue: { endpoint: "/github/user/issues/" },
-      branch: { endpoint: "/github/branches/" },
-      pulls: { endpoint: "/github/user/pulls/" },
+      issue_number: {
+        endpoint: "github/user/issues/",
+        parameter: "repo_full_name",
+        dependency: "repository",
+        transformResponse: (data: any) => (data.issues || []).map((issue: string) => ({
+          label: issue,
+          value: issue.split(' - ').pop() || issue
+        }))
+      },
+      branch: {
+        endpoint: "github/branches/",
+        parameter: "repo_full_name",
+        dependency: "repository"
+      },
+      pulls: {
+        endpoint: "github/user/pulls/",
+        parameter: "repo_full_name",
+        dependency: "repository"
+      },
+      events: {
+        endpoint: "github/webhooks/create/possible_events/",
+        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((e: string) => ({ label: e, value: e }))
+      },
+      pull_number: {
+        endpoint: "github/user/pulls/",
+        parameter: "repo_full_name",
+        dependency: "repository",
+        transformResponse: (data: any) => (data.pulls || []).map((p: string) => ({
+          label: p,
+          value: p.split(' - ').pop() || p
+        }))
+      }
     },
     gitlab: {
       project_id: {
-        endpoint: "/gitlab/projects/",
-        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((p: any) => ({
-          label: p.name || p.id?.toString() || p.toString(),
-          value: p.id?.toString() || p.toString()
-        }))
+        endpoint: "gitlab/projects/",
+        transformResponse: (data: any) => {
+          const projects = Array.isArray(data) ? data : (data.projects || data.repos || []);
+          return projects.map((p: any) => ({
+            label: p.path_with_namespace || p.name || p.id?.toString() || p.toString(),
+            value: p.id?.toString() || p.toString()
+          }));
+        }
       },
-      assignee: { endpoint: "/gitlab/users/" },
-      branches: { endpoint: "/gitlab/user/branches/" },
-      issues: { endpoint: "/gitlab/user/issues/" },
-      merge_request: { endpoint: "/gitlab/user/merge-requests/" },
+      merge_request_iid: {
+        endpoint: "gitlab/user/merge_requests/",
+        parameter: "project_id",
+        dependency: "project_id",
+        transformResponse: (data: any) => (data.merge_requests || []).map((mr: string, index: string) => ({ label: mr, value: index }))
+      },
+     branch: {
+        endpoint: "gitlab/user/branches/",
+        parameter: "project_id",
+        dependency: "project_id",
+        transformResponse: (data: any) => (data.branches || []).map((c: any) => ({ label: c, value:  c}))
+      },
+      assignee: {
+        endpoint: "gitlab/users/",
+
+        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((u: any) => ({ label: u.login || u, value: u.login || u }))
+      },
+      issue_iid: { 
+        endpoint: "gitlab/user/issues/",
+        parameter: "project_id",
+        dependency: "project_id",
+        transformResponse: (data: any) => (data.issues || []).map((issue_iid: string) => ({
+          label: issue_iid,
+          value: issue_iid.split(' - ').pop() || issue_iid
+        })),
+      },
+      events: {
+        endpoint: "gitlab/webhooks/create/possible_events/",
+        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((e: string) => ({ label: e, value: e }))
+      },
     },
     slack: {
       channel: {
-        endpoint: "/slack/channels/",
-        transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((c: any) => ({ label: c.name || c, value: c.id || c }))
+        endpoint: "slack/channels/",
+        transformResponse: (data: any) => (data.channels || []).map((c: any) => ({ label: c.name || c, value: c.id || c }))
       },
-      emojis: { endpoint: "/slack/emojis/" },
-      messages: { endpoint: "/slack/messages/" },
-      users: { endpoint: "/slack/users/" }
+      emojis: { endpoint: "slack/emojis/" },
+      messages: { endpoint: "slack/messages/" },
+      users: { endpoint: "slack/users/" }
     },
     todoist: {
       project_id: {
-        endpoint: "/todoist/projects/",
+        endpoint: "todoist/projects/",
         transformResponse: (data: any) => {
           console.log("Todoist Projects Raw Data:", data);
           const projects = data.projects || data;
@@ -95,8 +213,8 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
           }));
         }
       },
-      task: {
-        endpoint: "/todoist/tasks/",
+      task_id: {
+        endpoint: "todoist/tasks/",
         transformResponse: (data: any) => {
           console.log("Todoist Tasks Raw Data:", data);
           const tasks = data.tasks || data;
@@ -106,12 +224,12 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
           }));
         }
       },
-    }
+    },
   },
 };
 
 // Hook personnalisé pour récupérer les options dynamiques
-const useDynamicOptions = (field: ConfigMap) => {
+const useDynamicOptions = (field: ConfigMap, value: string, allValues: Record<string, any>) => {
   const [options, setOptions] = useState<SelectOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +247,21 @@ const useDynamicOptions = (field: ConfigMap) => {
       setError(null);
 
       try {
-        const res = await api.get<any>(config.endpoint);
+        const params: Record<string, any> = {};
+
+        if (config.dependency) {
+          const dependencyValue = allValues[config.dependency];
+          if (!dependencyValue) {
+            setOptions([]);
+            setLoading(false);
+            return;
+          }
+          params[config.parameter || config.dependency] = dependencyValue;
+        } else if (config.parameter) {
+          params[config.parameter] = value;
+        }
+        const res = await api.get<any>(config.endpoint, { params });
+        console.log("hannnn : ", res.data);
         const data = config.transformResponse
           ? config.transformResponse(res.data)
           : Array.isArray(res.data)
@@ -145,13 +277,13 @@ const useDynamicOptions = (field: ConfigMap) => {
     };
 
     fetchOptions();
-  }, [field.step, field.service, field.field]);
+  }, [field.step, field.service, field.field, value, JSON.stringify(allValues)]);
 
   return { options, loading, error };
 };
 
-export const ConfigField = ({ field, value, onChange, fallback }: Props) => {
-  const { options, loading, error } = useDynamicOptions(field);
+export const ConfigField = ({ field, value, onChange, fallback, allValues }: Props) => {
+  const { options, loading, error } = useDynamicOptions(field, value, allValues);
 
   if (loading) {
     return (

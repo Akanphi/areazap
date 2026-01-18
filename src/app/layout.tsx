@@ -38,6 +38,7 @@ export default function RootLayout({
     <html lang="fr">
       <body
         className={`${monoton.variable} ${open_sans.variable} ${epilogue.variable} ${montserrat.variable} antialiased bg-white min-h-screen`}
+        suppressHydrationWarning
       >
         <AuthProvider>
           {children}

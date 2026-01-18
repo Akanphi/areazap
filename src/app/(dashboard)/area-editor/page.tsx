@@ -20,7 +20,7 @@ import {
 import { useSearchParams, useRouter } from "next/navigation";
 import { createArea, patchArea, getArea, validateArea, AreaStatus } from "@/api/areas";
 import api from "@/api/api";
-import { getExternalServices, getServiceDefinitions, getGithubRepos, getGitlabProjects, handleOAuthCallback, requestConsent } from "@/api/services";
+import { getExternalServices, getServiceDefinitions, handleOAuthCallback, requestConsent } from "@/api/services";
 import { getTriggerConfig } from "@/api/triggers";
 import { createAreaTrigger, authorizeAreaTrigger, patchAreaTrigger, deleteAreaTrigger } from "@/api/areaTriggers";
 import { createAreaAction, authorizeAreaAction, patchAreaAction, deleteAreaAction } from "@/api/areaActions";
@@ -34,7 +34,7 @@ export const dynamic = 'force-dynamic';
 
 /** * COMPOSANT ALERTP POP (Intégré pour éviter l'erreur d'import)
  */
-const AlertPop = ({ message, isVisible, onClose, autoHideDuration = 3000 }: any) => {
+const AlertPop = ({ message, isVisible, onClose, autoHideDuration = 5000, isError = false }: any) => {
     useEffect(() => {
         if (isVisible) {
             const timer = setTimeout(onClose, autoHideDuration);
@@ -46,11 +46,11 @@ const AlertPop = ({ message, isVisible, onClose, autoHideDuration = 3000 }: any)
 
     return (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-gray-700">
-                <CheckCircle className="w-5 h-5 text-[#07BB9C]" />
+            <div className={`${isError ? 'bg-red-600' : 'bg-gray-900'} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${isError ? 'border-red-500' : 'border-gray-700'}`}>
+                {isError ? <AlertCircle className="w-5 h-5 text-white" /> : <CheckCircle className="w-5 h-5 text-[#07BB9C]" />}
                 <span className="font-medium">{message}</span>
-                <button onClick={onClose} className="ml-2 hover:bg-gray-800 p-1 rounded-full transition-colors">
-                    <X className="w-4 h-4 text-gray-400" />
+                <button onClick={onClose} className="ml-2 hover:bg-black/20 p-1 rounded-full transition-colors">
+                    <X className="w-4 h-4 text-white/80" />
                 </button>
             </div>
         </div>
@@ -148,14 +148,14 @@ function ZapsEditorContent() {
     const [zapName, setZapName] = useState("Untitled Area");
     const [zapDescription, setZapDescription] = useState("");
     const [isEditingName, setIsEditingName] = useState(false);
-    const [alertConfig, setAlertConfig] = useState({ isVisible: false, message: "" });
+    const [alertConfig, setAlertConfig] = useState({ isVisible: false, message: "", isError: false });
 
     // Dynamic Data State
     const [services, setServices] = useState<ExternalService[]>([]);
     const [serviceDefinitions, setServiceDefinitions] = useState<Record<string, ServiceDefinition>>({});
     const [triggerConfigs, setTriggerConfigs] = useState<Record<string, any>>({});
     const [isLoadingServices, setIsLoadingServices] = useState(false);
-    const [dynamicFieldOptions, setDynamicFieldOptions] = useState<Record<string, FieldChoice[]>>({});
+
     const [serviceAccounts, setServiceAccounts] = useState<ServiceAccount[]>([]);
     const [connectedServices, setConnectedServices] = useState<ExternalService[]>([]);
 
@@ -330,7 +330,6 @@ function ZapsEditorContent() {
                 // Refresh dynamic data for the current app
                 const currentStep = steps.find(s => s.isExpanded);
                 if (currentStep) {
-                    fetchDynamicData(currentStep.app);
                     // Refresh service accounts and connected services
                     Promise.all([
                         getServiceAccounts(),
@@ -365,7 +364,6 @@ function ZapsEditorContent() {
                         // Refresh dynamic data
                         const currentStep = steps.find(s => s.isExpanded);
                         if (currentStep) {
-                            fetchDynamicData(currentStep.app);
                             // Mark step as validated if it was waiting for auth
                             if (!currentStep.isValidated && currentStep.createdId) {
                                 updateStep(currentStep.id, { isValidated: true });
@@ -385,8 +383,8 @@ function ZapsEditorContent() {
         }
     }, [searchParams, router, steps]);
 
-    const showAlert = (message: string) => {
-        setAlertConfig({ isVisible: true, message });
+    const showAlert = (message: string, isError: boolean = false) => {
+        setAlertConfig({ isVisible: true, message, isError });
     };
 
     const addStep = (type: "reaction") => {
@@ -403,6 +401,16 @@ function ZapsEditorContent() {
 
     const removeStep = async (stepId: string) => {
         const step = steps.find(s => s.id === stepId);
+
+        // Prevent deletion of the last trigger
+        if (step?.type === "trigger") {
+            const triggerCount = steps.filter(s => s.type === "trigger").length;
+            if (triggerCount <= 1) {
+                showAlert("Cannot delete the last trigger. An AREA must have at least one trigger.", true);
+                return;
+            }
+        }
+
         if (step?.createdId) {
             try {
                 if (step.type === "trigger") {
@@ -410,7 +418,7 @@ function ZapsEditorContent() {
                 } else {
                     await deleteAreaAction(step.createdId);
                 }
-                showAlert("Step deleted successfully!");
+                showAlert(`${step.type} deleted successfully!`);
             } catch (error) {
                 console.error("Failed to delete step:", error);
                 showAlert("Failed to delete step from backend.");
@@ -432,20 +440,12 @@ function ZapsEditorContent() {
     };
 
     const handleAppChange = async (stepId: string, appSlug: string) => {
-        // Check if service is already connected
-        const isConnected = connectedServices.some(s => s.slug.toLowerCase() === appSlug.toLowerCase());
-
-        if (isConnected) {
-            console.log(`Service ${appSlug} is already connected, skipping consent modal.`);
-            await proceedWithService(stepId, appSlug);
-        } else {
-            // Open consent modal
-            setConsentModal({
-                isOpen: true,
-                serviceSlug: appSlug,
-                stepId: stepId
-            });
-        }
+        // Always open consent modal as requested by the user
+        setConsentModal({
+            isOpen: true,
+            serviceSlug: appSlug,
+            stepId: stepId
+        });
     };
 
     const proceedWithService = async (stepId: string, serviceSlug: string) => {
@@ -569,8 +569,6 @@ function ZapsEditorContent() {
                 }
             }
 
-            // 2. Fetch Dynamic Data (Always attempt if app is selected)
-            await fetchDynamicData(step.app);
 
             updateStep(stepId, { isCreating: false });
         } catch (error) {
@@ -579,25 +577,6 @@ function ZapsEditorContent() {
         }
     };
 
-    const fetchDynamicData = async (appSlug: string) => {
-        try {
-            if (appSlug === 'github') {
-                const repos = await getGithubRepos();
-                if (Array.isArray(repos)) {
-                    const choices = repos.map((r: any) => ({ label: r.full_name || r.name, value: r.full_name || r.name }));
-                    setDynamicFieldOptions(prev => ({ ...prev, 'repository': choices }));
-                }
-            } else if (appSlug === 'gitlab') {
-                const projects = await getGitlabProjects();
-                if (Array.isArray(projects)) {
-                    const choices = projects.map((p: any) => ({ label: p.path_with_namespace || p.name, value: p.id.toString() }));
-                    setDynamicFieldOptions(prev => ({ ...prev, 'project': choices }));
-                }
-            }
-        } catch (error) {
-            console.error("Failed to fetch dynamic data:", error);
-        }
-    };
 
     const handleValidateTrigger = async (stepId: string) => {
         const step = steps.find(s => s.id === stepId);
@@ -655,10 +634,19 @@ function ZapsEditorContent() {
             }
         } catch (error: any) {
             console.error("Failed to validate trigger:", error);
+            const is500 = error.response?.status === 500;
+            const message = is500
+                ? "En cas de code d'erreur 500, veuillez vous rendre dans services, déconnecter votre service GitLab et revenir créer votre AREA."
+                : (error.response?.data?.message || error.message || "Failed to validate trigger");
+
             updateStep(stepId, {
                 isValidating: false,
-                createError: error.response?.data?.message || error.message || "Failed to validate trigger"
+                createError: message
             });
+
+            if (is500) {
+                showAlert(message, true);
+            }
         }
     };
 
@@ -715,10 +703,19 @@ function ZapsEditorContent() {
             }
         } catch (error: any) {
             console.error("Failed to validate action:", error);
+            const is500 = error.response?.status === 500;
+            const message = is500
+                ? "En cas de code d'erreur 500, veuillez vous rendre dans services, déconnecter votre service GitLab et revenir créer votre AREA."
+                : (error.response?.data?.message || error.message || "Failed to validate action");
+
             updateStep(stepId, {
                 isValidating: false,
-                createError: error.response?.data?.message || error.message || "Failed to validate action"
+                createError: message
             });
+
+            if (is500) {
+                showAlert(message, true);
+            }
         }
     };
 
@@ -807,8 +804,13 @@ function ZapsEditorContent() {
                     router.push("/area-manager");
                     return;
                 }
+
+                if (error.response.status === 500) {
+                    showAlert("En cas de code d'erreur 500, veuillez vous rendre dans services, déconnecter votre service GitLab et revenir créer votre AREA.", true);
+                    return;
+                }
             }
-            showAlert("Failed to activate AREA.");
+            showAlert("Failed to activate AREA.", true);
         }
     };
 
@@ -844,8 +846,7 @@ function ZapsEditorContent() {
     };
 
     const renderField = (step: Step, field: FieldDefinition) => {
-        const dynamicChoices = dynamicFieldOptions[field.key];
-        const choices = dynamicChoices || field.choices;
+        const choices = field.choices;
 
         const configMapField: ConfigMap = {
             step: step.type === "reaction" ? "action" : step.type,
@@ -878,8 +879,12 @@ function ZapsEditorContent() {
                     </div>
                 ) : (field.type === 'dropdown' || choices) ? (
                     <select
-                        value={step.config[field.key] || ""}
-                        onChange={(e) => updateStep(step.id, { config: { ...step.config, [field.key]: e.target.value }, isValidated: false })}
+                        value={Array.isArray(step.config[field.key]) ? step.config[field.key][0] : (step.config[field.key] || "")}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            const finalVal = field.key === 'events' ? [val] : val;
+                            updateStep(step.id, { config: { ...step.config, [field.key]: finalVal }, isValidated: false });
+                        }}
                         className="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-purple-100 transition-all"
                         required={field.required}
                     >
@@ -893,8 +898,12 @@ function ZapsEditorContent() {
                 ) : (
                     <input
                         type={field.type === 'number' ? 'number' : 'text'}
-                        value={step.config[field.key] || ""}
-                        onChange={(e) => updateStep(step.id, { config: { ...step.config, [field.key]: e.target.value }, isValidated: false })}
+                        value={Array.isArray(step.config[field.key]) ? step.config[field.key][0] : (step.config[field.key] || "")}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            const finalVal = field.key === 'events' ? [val] : val;
+                            updateStep(step.id, { config: { ...step.config, [field.key]: finalVal }, isValidated: false });
+                        }}
                         className="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-purple-100 transition-all"
                         placeholder={field.placeholder}
                         required={field.required}
@@ -910,9 +919,13 @@ function ZapsEditorContent() {
                 </label>
                 <ConfigField
                     field={configMapField}
-                    value={step.config[field.key] || ""}
-                    onChange={(val) => updateStep(step.id, { config: { ...step.config, [field.key]: val }, isValidated: false })}
+                    value={Array.isArray(step.config[field.key]) ? step.config[field.key][0] : (step.config[field.key] || "")}
+                    onChange={(val) => {
+                        const finalVal = field.key === 'events' ? [val] : val;
+                        updateStep(step.id, { config: { ...step.config, [field.key]: finalVal }, isValidated: false });
+                    }}
                     fallback={standardInput}
+                    allValues={step.config}
                 />
                 {field.helpText && <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>}
             </div>
@@ -1036,9 +1049,27 @@ function ZapsEditorContent() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <button onClick={(e) => { e.stopPropagation(); removeStep(step.id); }} className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600">
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
+                                            {(() => {
+                                                const isLastTrigger = step.type === "trigger" && steps.filter(s => s.type === "trigger").length <= 1;
+                                                return (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (!isLastTrigger) {
+                                                                removeStep(step.id);
+                                                            }
+                                                        }}
+                                                        disabled={isLastTrigger}
+                                                        title={isLastTrigger ? "Cannot delete the last trigger" : "Delete step"}
+                                                        className={`p-2 rounded-lg transition-colors ${isLastTrigger
+                                                                ? 'text-gray-300 cursor-not-allowed'
+                                                                : 'text-red-600 hover:bg-red-100 cursor-pointer'
+                                                            }`}
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
+                                                );
+                                            })()}
                                             {step.isExpanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
                                         </div>
                                     </div>
@@ -1184,6 +1215,7 @@ function ZapsEditorContent() {
             <AlertPop
                 message={alertConfig.message}
                 isVisible={alertConfig.isVisible}
+                isError={alertConfig.isError}
                 onClose={() => setAlertConfig({ ...alertConfig, isVisible: false })}
             />
 
@@ -1204,7 +1236,7 @@ function ZapsEditorContent() {
                             </button>
                             <button
                                 onClick={handleConsentConfirm}
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-medium shadow-lg shadow-purple-600/20"
+                                className="px-4 py-2 bg-[#f66d32] hover:bg-[#f66d32]/60 text-white rounded-xl transition-colors font-medium shadow-lg shadow-purple-600/20"
                             >
                                 Confirm
                             </button>
