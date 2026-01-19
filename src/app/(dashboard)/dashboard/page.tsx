@@ -262,7 +262,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-[#07BB9C] bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-[#1A4B9E] bg-clip-text text-transparent mb-2">
             Area Dashboard
           </h1>
           <p className="text-gray-600 text-lg">Monitor your automation workflows and performance</p>

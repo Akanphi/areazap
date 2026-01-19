@@ -7,7 +7,7 @@ export default function PublicLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="min-h-screen flex flex-col bg-stone-50">
+        <div className="min-h-screen flex flex-col bg-stone-50 w-full">
             <Banner />
             <main className="flex-grow">
                 {children}

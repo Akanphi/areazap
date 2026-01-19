@@ -71,7 +71,7 @@ export default function SubscriptionPage() {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-12 text-center">
-                    <h1 className="text-4xl font-bold bg-[#07BB9C] bg-clip-text text-transparent mb-4">
+                    <h1 className="text-4xl font-bold bg-[#1A4B9E] bg-clip-text text-transparent mb-4">
                         Plans & Subscription
                     </h1>
                     <p className="text-gray-600 text-lg max-w-2xl mx-auto">

@@ -24,7 +24,7 @@ export default function ServiceCard({
             <div className={`h-32 bg-linear-to-br ${service.color} flex items-center justify-center relative`}>
                 <div className="absolute top-4 right-4">
                     {isConnected ? (
-                        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                        <div className="bg-teal-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                             <CheckCircle className="w-3 h-3" />
                             Connected
                         </div>

@@ -253,7 +253,7 @@ export default function ZapsManagerPage() {
                 <div className="mb-6 sm:mb-8">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                         <div>
-                            <h1 className="text-3xl sm:text-4xl font-bold bg-[#07BB9C] bg-clip-text text-transparent mb-2">
+                            <h1 className="text-3xl sm:text-4xl font-bold bg-[#1A4B9E] bg-clip-text text-transparent mb-2">
                                 Area's Manager
                             </h1>
                             <p className="text-gray-600 text-lg">Manage and monitor your automation workflows</p>

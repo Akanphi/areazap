@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body
-        className={`${monoton.variable} ${open_sans.variable} ${epilogue.variable} ${montserrat.variable} antialiased bg-white min-h-screen`}
+        className={`${monoton.variable} ${open_sans.variable} ${epilogue.variable} ${montserrat.variable} antialiased bg-white min-h-screen w-full overflow-x-hidden`}
         suppressHydrationWarning
       >
         <AuthProvider>

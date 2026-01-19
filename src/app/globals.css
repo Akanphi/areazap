@@ -12,7 +12,7 @@
   --font-open_sans: var(--font-open-sans);
   --font-montserrat: var(--font-montserrat);
   --font-epilogue: var(--font-epilogue);
-  
+
   /* New Teal Palette */
   --color-brand-primary: #1DD3C3;
   --color-brand-secondary: #2E5BFF;
@@ -31,7 +31,7 @@
 
 body {
   background: var(--background);
-  color:  #333652;
+  color: #333652;
   font-family: var(--font-open-sans);
 }
 
@@ -45,7 +45,6 @@ body {
   padding: 0;
   margin: 0;
   height: 100%;
-  background-color: #f4e4e3;
   font-family: var(--font-open-sans);
 }
 
