@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { usePathname } from "next/navigation";
 import { LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MenuItem {
     icon: string;
@@ -78,12 +79,12 @@ interface MenuProps {
 }
 
 export default function Menu({ isMobile = false }: MenuProps) {
+    const { logout } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
-    const handleLogout = () => {
-        // logout();
-        router.push('/');
+    const handleLogout = async () => {
+        await logout();
     };
 
     return (
