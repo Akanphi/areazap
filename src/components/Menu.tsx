@@ -73,7 +73,11 @@ const menuItems: MenuItem[] = [
     },
 ]
 
-export default function Menu() {
+interface MenuProps {
+    isMobile?: boolean;
+}
+
+export default function Menu({ isMobile = false }: MenuProps) {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -94,12 +98,13 @@ export default function Menu() {
                         <button
                             key={item.label}
                             onClick={handleLogout}
-                            className="w-full flex items-center justify-center lg:justify-start gap-4 py-3 px-4 rounded-xl transition-all duration-300 group text-gray-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-600 cursor-pointer border border-transparent hover:border-red-200 hover:shadow-md"
+                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-300 group text-gray-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-600 cursor-pointer border border-transparent hover:border-red-200 hover:shadow-md ${isMobile ? 'justify-start' : 'justify-center lg:justify-start'
+                                }`}
                         >
                             <div className="shrink-0 p-2 rounded-lg bg-gray-100 group-hover:bg-red-100 transition-all duration-300">
                                 <LogOut className="w-5 h-5 text-gray-600 group-hover:text-red-600 transition-colors duration-300" />
                             </div>
-                            <span className="hidden lg:block font-medium">{item.label}</span>
+                            <span className={`font-medium ${isMobile ? 'block' : 'hidden lg:block'}`}>{item.label}</span>
                         </button>
                     )
                 }
@@ -108,10 +113,10 @@ export default function Menu() {
                     <Link
                         href={item.href}
                         key={item.label}
-                        className={`flex items-center justify-center lg:justify-start gap-4 py-3 px-4 rounded-xl transition-all duration-300 group border ${isActive
+                        className={`flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-300 group border ${isActive
                             ? 'bg-gradient-to-r from-purple-50 via-pink-50 to-rose-50 text-purple-700 shadow-md border-purple-200'
                             : 'text-gray-600 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-pink-50/50 hover:text-gray-900 border-transparent hover:border-purple-100 hover:shadow-sm'
-                            }`}
+                            } ${isMobile ? 'justify-start' : 'justify-center lg:justify-start'}`}
                     >
                         <div className={`shrink-0 p-2 rounded-lg transition-all duration-300 ${isActive
                             ? 'bg-gradient-to-br from-purple-200 to-pink-200 shadow-sm'
@@ -126,8 +131,8 @@ export default function Menu() {
                                     }`}
                             />
                         </div>
-                        <span className={`hidden lg:block font-medium transition-all duration-300 ${isActive ? 'font-semibold' : ''
-                            }`}>
+                        <span className={`font-medium transition-all duration-300 ${isActive ? 'font-semibold' : ''
+                            } ${isMobile ? 'block' : 'hidden lg:block'}`}>
                             {item.label}
                         </span>
                     </Link>

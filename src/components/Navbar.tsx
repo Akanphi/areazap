@@ -278,7 +278,7 @@ const Navbar = () => {
             </div>
 
             <div onClick={() => setShowMobileMenu(false)}>
-              <SidebarMenu />
+              <SidebarMenu isMobile={true} />
             </div>
           </div>
         </div>
