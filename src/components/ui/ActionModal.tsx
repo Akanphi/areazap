@@ -47,9 +47,9 @@ const ActionModal = ({
         };
       case 'loading':
         return {
-          icon: <Loader2 className="w-8 h-8 text-[#f66d32] animate-spin" />,
-          bg: "bg-orange-50",
-          accent: "border-orange-100"
+          icon: <Loader2 className="w-8 h-8 text-[#1DD3C3] animate-spin" />,
+          bg: "bg-[#1DD3C3]/5",
+          accent: "border-[#1DD3C3]/20"
         };
       default:
         return {
@@ -101,7 +101,7 @@ const ActionModal = ({
           <div className="flex flex-col gap-3">
             <button
               onClick={onConfirm || onClose}
-              className="w-full py-4 bg-[#f66d32] text-white rounded-2xl font-black text-sm shadow-lg shadow-orange-100 hover:bg-[#e05d28] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 group"
+              className="w-full py-4 bg-[#1DD3C3] text-white rounded-2xl font-black text-sm shadow-lg shadow-[#1DD3C3]/20 hover:bg-[#00E5CC] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 group"
             >
               {confirmText}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -117,7 +117,7 @@ const ActionModal = ({
         </div>
 
         {/* Decorative Bottom Bar */}
-        <div className="h-2 w-full bg-[#f66d32] opacity-10" />
+        <div className="h-2 w-full bg-[#1DD3C3] opacity-10" />
       </div>
     </div>
   );

@@ -12,6 +12,13 @@
   --font-open_sans: var(--font-open-sans);
   --font-montserrat: var(--font-montserrat);
   --font-epilogue: var(--font-epilogue);
+  
+  /* New Teal Palette */
+  --color-brand-primary: #1DD3C3;
+  --color-brand-secondary: #2E5BFF;
+  --color-brand-accent: #00E5CC;
+  --color-brand-dark: #2D3436;
+  --color-brand-grey: #636E72;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,7 +36,7 @@ body {
 }
 
 input {
-  accent-color: #F18585;
+  accent-color: #1DD3C3;
   border: 1px solid #ccc;
 }
 

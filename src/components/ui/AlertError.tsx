@@ -27,7 +27,7 @@ export default function AlertError({ message, onClose, isVisible, autoHideDurati
             <div className="relative overflow-hidden rounded-2xl border border-red-500/20 bg-white/80 p-4 shadow-2xl backdrop-blur-xl">
                 {/* Background Glow */}
                 <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-red-500/10 blur-2xl" />
-                <div className="absolute -bottom-4 -left-4 h-24 w-24 rounded-full bg-orange-500/10 blur-2xl" />
+                <div className="absolute -bottom-4 -left-4 h-24 w-24 rounded-full bg-[#1DD3C3]/10 blur-2xl" />
 
                 <div className="relative flex items-start gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-600">

@@ -103,7 +103,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             '/dev-platform',
             '/terms',
             '/privacy',
-            '/how-it-works'
+            '/how-it-works',
+            '/verify-reset'
+            
         ];
         if (!isLoading && !user && !publicRoutes.includes(pathname)) {
             router.push('/login');

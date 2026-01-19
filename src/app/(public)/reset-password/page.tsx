@@ -1,11 +1,13 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, ArrowRight, CheckCircle, ArrowLeft } from 'lucide-react';
 import { requestPasswordReset } from '@/api/auth';
 
 const ResetPasswordPage = () => {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -25,6 +27,16 @@ const ResetPasswordPage = () => {
         }
     };
 
+    useEffect(() => {
+        if (isSubmitted) {
+            // Redirect to verify-reset page after 3 seconds
+            const timer = setTimeout(() => {
+                router.push(`/verify-reset?email=${encodeURIComponent(email)}`);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isSubmitted, email, router]);
 
     if (isSubmitted) {
         return (
@@ -34,15 +46,18 @@ const ResetPasswordPage = () => {
                         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <CheckCircle className="w-8 h-8 text-green-600" />
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Email envoyé !</h2>
-                        <p className="text-gray-600 mb-8">
-                            Si un compte existe avec l'adresse {email}, vous recevrez un lien pour réinitialiser votre mot de passe.
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Code envoyé !</h2>
+                        <p className="text-gray-600 mb-4">
+                            Si un compte existe avec l'adresse {email}, vous recevrez un code à 6 chiffres pour réinitialiser votre mot de passe.
+                        </p>
+                        <p className="text-sm text-gray-500 mb-8">
+                            Redirection dans quelques secondes...
                         </p>
                         <Link
-                            href="/login"
-                            className="w-full flex bg-[#f66d32] justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-brand-primary transition-all hover:shadow-lg hover:shadow-brand-primary/30 transform hover:-translate-y-0.5"
+                            href={`/verify-reset?email=${encodeURIComponent(email)}`}
+                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#1DD3C3] transition-all hover:shadow-lg hover:shadow-brand-primary/30 transform hover:-translate-y-0.5"
                         >
-                            Retour à la connexion
+                            Continuer maintenant
                         </Link>
                     </div>
                 </div>
@@ -58,7 +73,7 @@ const ResetPasswordPage = () => {
                         Mot de passe oublié ?
                     </h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Entrez votre email pour recevoir un lien de réinitialisation
+                        Entrez votre email pour recevoir un code à 6 chiffres
                     </p>
                 </div>
 
@@ -90,7 +105,7 @@ const ResetPasswordPage = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className={`w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#f66d32] hover:bg-[#f66d32] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary/100 transition-all ${isLoading ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg hover:shadow-brand-primary/30 transform hover:-translate-y-0.5'}`}
+                                className={`w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-[#1DD3C3] hover:bg-[#1DD3C3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary/100 transition-all ${isLoading ? 'opacity-75 cursor-not-allowed' : 'hover:shadow-lg hover:shadow-brand-primary/30 transform hover:-translate-y-0.5'}`}
                             >
                                 {isLoading ? (
                                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -99,8 +114,8 @@ const ResetPasswordPage = () => {
                                     </svg>
                                 ) : (
                                     <p className="flex items-center text-white font-bold">
-                                        Envoyer le lien
-                                        <ArrowRight className="ml-2 h-5 w-5 text-white font-bold"/>
+                                        Envoyer le code
+                                        <ArrowRight className="ml-2 h-5 w-5 text-white font-bold" />
                                     </p>
                                 )}
                             </button>
@@ -120,7 +135,7 @@ const ResetPasswordPage = () => {
                         </div>
 
                         <div className="mt-6 text-center">
-                            <Link href="/login" className="font-medium bg-[#f66d32] text-white hover:text-brand-primary/100 flex items-center justify-center gap-2">
+                            <Link href="/login" className="font-medium text-black hover:text-brand-primary/100 flex items-center justify-center gap-2">
                                 <ArrowLeft className="w-4 h-4" />
                                 Retour à la connexion
                             </Link>

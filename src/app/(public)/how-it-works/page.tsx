@@ -8,9 +8,9 @@ const STEPS = [
     {
         title: "1. Choose a Trigger",
         desc: "An event that starts your automation. Like a new email in Gmail or a new lead in your CRM.",
-        icon: <Play className="w-8 h-8 text-orange-500" />,
-        color: "bg-orange-50",
-        border: "border-orange-100"
+        icon: <Play className="w-8 h-8 text-[#1DD3C3]" />,
+        color: "bg-[#1DD3C3]/5",
+        border: "border-[#1DD3C3]/20"
     },
     {
         title: "2. Set an Action",
@@ -34,11 +34,11 @@ export default function HowItWorksPage() {
             <div className="max-w-7xl mx-auto">
                 {/* Hero Section */}
                 <div className="text-center mb-24">
-                    <span className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-[0.2em] text-orange-600 uppercase bg-orange-50 rounded-full">
+                    <span className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-[0.2em] text-[#1DD3C3] uppercase bg-[#1DD3C3]/5 rounded-full">
                         The Basics
                     </span>
                     <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 tracking-tight font-epilogue">
-                        How <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-purple-600">Area</span> Works
+                        How <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1DD3C3] to-purple-600">Area</span> Works
                     </h1>
                     <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
                         Area connects your apps and automates your workflows.
@@ -74,12 +74,12 @@ export default function HowItWorksPage() {
                     {/* Triggers */}
                     <div className="flex flex-col lg:flex-row items-center gap-16">
                         <div className="flex-1 space-y-8">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-600 rounded-xl font-bold text-sm">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1DD3C3]/5 text-[#1DD3C3] rounded-xl font-bold text-sm">
                                 <MousePointer2 className="w-4 h-4" />
                                 Concept 01
                             </div>
                             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 font-epilogue">
-                                What is a <span className="text-orange-600">Trigger</span>?
+                                What is a <span className="text-[#1DD3C3]">Trigger</span>?
                             </h2>
                             <p className="text-lg text-slate-600 leading-relaxed">
                                 A trigger is the event that starts your automation. Think of it as the "When this happens" part of your workflow.
@@ -88,14 +88,14 @@ export default function HowItWorksPage() {
                             <ul className="space-y-4">
                                 {["New email in Gmail", "New lead in Salesforce", "New file in Dropbox", "New mention on Twitter"].map((item, i) => (
                                     <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
-                                        <CheckCircle2 className="w-5 h-5 text-orange-500" />
+                                        <CheckCircle2 className="w-5 h-5 text-[#1DD3C3]" />
                                         {item}
                                     </li>
                                 ))}
                             </ul>
                         </div>
                         <div className="flex-1 bg-white p-8 rounded-[3rem] shadow-2xl border border-stone-100 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-50"></div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#1DD3C3]/5 rounded-full blur-3xl -mr-32 -mt-32 opacity-50"></div>
                             <img src="/automation.png" alt="Trigger Example" className="relative z-10 rounded-2xl group-hover:scale-105 transition-transform duration-700" />
                         </div>
                     </div>
@@ -142,7 +142,7 @@ export default function HowItWorksPage() {
                             Start your first Zap in less than 2 minutes.
                         </p>
                         <div className="flex flex-wrap justify-center gap-6">
-                            <Link href="/register" className="px-10 py-4 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 transition-all hover:scale-105 shadow-xl shadow-orange-600/20">
+                            <Link href="/register" className="px-10 py-4 bg-[#1DD3C3] text-white font-bold rounded-2xl hover:bg-[#00E5CC] transition-all hover:scale-105 shadow-xl shadow-[#1DD3C3]/20">
                                 Get Started Free
                             </Link>
                             <Link href="/integrations" className="px-10 py-4 bg-white/10 text-white font-bold rounded-2xl hover:bg-white/20 transition-all backdrop-blur-md border border-white/20">

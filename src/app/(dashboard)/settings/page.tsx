@@ -44,8 +44,8 @@ export default function SettingsPage() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === tab.id
-                                            ? "bg-[#f66d32] text-white shadow-lg shadow-purple-100"
-                                            : "text-gray-600 hover:bg-gray-50"
+                                        ? "bg-[#1DD3C3] text-white shadow-lg shadow-purple-100"
+                                        : "text-gray-600 hover:bg-gray-50"
                                         }`}
                                 >
                                     <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-white" : "text-gray-400"}`} />
@@ -126,7 +126,7 @@ export default function SettingsPage() {
                                                     <p className="font-bold text-gray-900">{item.title}</p>
                                                     <p className="text-sm text-gray-500">{item.desc}</p>
                                                 </div>
-                                                <button className={`w-12 h-6 rounded-full transition-all relative ${item.enabled ? "bg-[#f66d32]" : "bg-gray-300"}`}>
+                                                <button className={`w-12 h-6 rounded-full transition-all relative ${item.enabled ? "bg-[#1DD3C3]" : "bg-gray-300"}`}>
                                                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${item.enabled ? "right-1" : "left-1"}`}></div>
                                                 </button>
                                             </div>
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                                         API Management
                                     </h3>
                                     <div className="p-6 rounded-2xl bg-[#f66d29]/10 border border-purple-100">
-                                        <p className="text-sm text-[#f66d32] mb-4">
+                                        <p className="text-sm text-[#1DD3C3] mb-4">
                                             Use these keys to authenticate your requests to the Area API. Keep them secret!
                                         </p>
                                         <div className="space-y-4">

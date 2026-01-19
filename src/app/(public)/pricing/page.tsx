@@ -71,7 +71,7 @@ export default function SubscriptionPage() {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-12 text-center">
-                    <h1 className="text-4xl font-bold bg-clip-text text-[#f66d32] mb-4">
+                    <h1 className="text-4xl font-bold bg-clip-text text-[#1DD3C3] mb-4">
                         Plans & Subscription
                     </h1>
                     <p className="text-gray-600 text-lg max-w-2xl mx-auto">
@@ -85,8 +85,8 @@ export default function SubscriptionPage() {
                         <button
                             onClick={() => setBillingCycle("monthly")}
                             className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all ${billingCycle === "monthly"
-                                    ? "bg-purple-600 text-white shadow-lg"
-                                    : "text-gray-600 hover:bg-gray-50"
+                                ? "bg-purple-600 text-white shadow-lg"
+                                : "text-gray-600 hover:bg-gray-50"
                                 }`}
                         >
                             Monthly
@@ -94,8 +94,8 @@ export default function SubscriptionPage() {
                         <button
                             onClick={() => setBillingCycle("yearly")}
                             className={`px-6 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${billingCycle === "yearly"
-                                    ? "bg-purple-600 text-white shadow-lg"
-                                    : "text-gray-600 hover:bg-gray-50"
+                                ? "bg-purple-600 text-white shadow-lg"
+                                : "text-gray-600 hover:bg-gray-50"
                                 }`}
                         >
                             Yearly
@@ -110,8 +110,8 @@ export default function SubscriptionPage() {
                         <div
                             key={plan.name}
                             className={`relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border-2 transition-all duration-300 hover:scale-105 ${plan.popular
-                                    ? "border-purple-400 shadow-purple-100"
-                                    : "border-gray-100"
+                                ? "border-purple-400 shadow-purple-100"
+                                : "border-gray-100"
                                 }`}
                         >
                             {plan.popular && (
@@ -139,8 +139,8 @@ export default function SubscriptionPage() {
                                 {plan.features.map((feature) => (
                                     <div key={feature} className="flex items-center gap-3">
                                         <div className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.color === 'purple' ? 'bg-purple-100 text-purple-600' :
-                                                plan.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' :
-                                                    'bg-gray-100 text-gray-600'
+                                            plan.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' :
+                                                'bg-gray-100 text-gray-600'
                                             }`}>
                                             <Check className="w-3 h-3" />
                                         </div>
@@ -151,10 +151,10 @@ export default function SubscriptionPage() {
 
                             <button
                                 className={`w-full py-4 rounded-2xl font-bold transition-all duration-300 ${plan.current
-                                        ? "bg-gray-100 text-gray-500 cursor-default"
-                                        : plan.color === 'purple'
-                                            ? "bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-200 hover:scale-105"
-                                            : "bg-gray-900 text-white hover:bg-gray-800 hover:scale-105"
+                                    ? "bg-gray-100 text-gray-500 cursor-default"
+                                    : plan.color === 'purple'
+                                        ? "bg-purple-600 text-white hover:bg-purple-700 shadow-lg shadow-purple-200 hover:scale-105"
+                                        : "bg-gray-900 text-white hover:bg-gray-800 hover:scale-105"
                                     }`}
                             >
                                 {plan.buttonText}

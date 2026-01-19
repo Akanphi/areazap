@@ -30,11 +30,12 @@ export const Footer = () => {
             </section>
             <section className="bottom flex items-center justify-between">
                 <Image
-                    className="dark:invert"
-                    src="/logo.svg"
+                    className=""
+                    src="/logo.png"
                     alt="Area logo"
                     width={60}
-                    height={20}
+                    height={0}
+                    style={{ height: 'auto' }}
                     priority
                 />
                 <div className="flex gap-3 items-center">

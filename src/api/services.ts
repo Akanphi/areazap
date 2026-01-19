@@ -125,8 +125,55 @@ export const getGitlabWebhookEvents = async (): Promise<string[]> => {
 };
 
 /**
- * Handles the OAuth callback.
+ * OAuth2 Frontend-Initiated Flow
+ */
+
+export interface OAuthCodeSubmission {
+    code: string;
+    state: string;
+    provider: string;
+}
+
+export interface OAuthSessionResponse {
+    session_id: string;
+    status?: 'pending' | 'success' | 'error';
+}
+
+export interface OAuthCredentialsResponse {
+    status: 'pending' | 'success' | 'error';
+    access?: string;
+    refresh?: string;
+    user?: {
+        id: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+    };
+    error?: string;
+}
+
+/**
+ * Submit OAuth authorization code to backend
+ * POST /area_api/auth/oauth/submit/
+ */
+export const submitOAuthCode = async (data: OAuthCodeSubmission): Promise<OAuthSessionResponse> => {
+    const response = await api.post<OAuthSessionResponse>(`auth/login/${data.provider}/verify`, data);
+    return response.data;
+};
+
+/**
+ * Poll for OAuth session credentials
+ * GET /area_api/auth/oauth/status/{session_id}/
+ */
+export const pollOAuthSession = async (sessionId: string): Promise<OAuthCredentialsResponse> => {
+    const response = await api.get<OAuthCredentialsResponse>(`auth/oauth/status/${sessionId}/`);
+    return response.data;
+};
+
+/**
+ * Legacy: Handles the OAuth callback.
  * GET /area_api/oauth/callback/
+ * @deprecated Use submitOAuthCode and pollOAuthSession instead
  */
 export const handleOAuthCallback = async (params?: Record<string, string>): Promise<any> => {
     const response = await api.get('oauth/callback/', { params });

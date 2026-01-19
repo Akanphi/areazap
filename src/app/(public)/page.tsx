@@ -35,7 +35,7 @@ export default function Home() {
       <section className="bg-[#F8F4F0] flex items-center justify-between px-8 py-30">
         <div className="">
           <h1 className="text-8xl uppercase font-bold pt-8">No AI hype here.<br /> Just results.</h1>
-          <h2 className="text-8xl font-bold text-[#F66D32] text-start pt-4">147,562,1</h2>
+          <h2 className="text-8xl font-bold text-[#1DD3C3] text-start pt-4">147,562,1</h2>
           <h2 className="text-2xl mt-3">Tasks automated on Area</h2>
         </div>
         <div className="w-[50%]">
@@ -50,7 +50,7 @@ export default function Home() {
               key={index}
               className={` text-lg
                   p-2 border hover:underline underline-offset-4 decoration-5 decoration-[#C5C0B1] cursor-pointer
-                  ${activeIndex === index ? "underline decoration-[#FF5E2C]" : ""}
+                  ${activeIndex === index ? "underline decoration-teal-500" : ""}
                 `}
               onClick={() => setActiveIndex(index)}
             >
@@ -80,7 +80,7 @@ export default function Home() {
           <h3 className="text-lg md:text-xl text-center text-gray-700">
             And we add new integrations every week
           </h3>
-          <button className="bg-[#FF5E2C] hover:bg-[#E54E1C] text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-md hover:shadow-lg">
+          <button className="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-md hover:shadow-lg">
             View all integrations
           </button>
         </div>
@@ -113,7 +113,7 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="ml-3 cursor-pointer px-8 py-3 bg-orange-500 text-white font-semibold text-base rounded-full hover:bg-orange-600 hover:shadow-xl transition-all duration-300 transform"
+                className="ml-3 cursor-pointer px-8 py-3 bg-teal-500 text-white font-semibold text-base rounded-full hover:bg-teal-600 hover:shadow-xl transition-all duration-300 transform"
               >
                 Get Started
               </button>

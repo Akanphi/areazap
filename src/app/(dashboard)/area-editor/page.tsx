@@ -494,8 +494,17 @@ function ZapsEditorContent() {
             if (response.is_authenticated) {
                 await proceedWithService(stepId, serviceSlug);
             } else if (response.authorization_url) {
-                // Redirect to auth url
-                window.open(response.authorization_url, '_blank');
+                // Open in a popup for better UX
+                const width = 600;
+                const height = 700;
+                const left = window.screenX + (window.outerWidth - width) / 2;
+                const top = window.screenY + (window.outerHeight - height) / 2;
+
+                window.open(
+                    response.authorization_url,
+                    `Authorize ${serviceSlug}`,
+                    `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+                );
                 updateStep(stepId, {
                     consentMessage: "Get back and select the service again once you've connected to your service."
                 });
@@ -627,8 +636,18 @@ function ZapsEditorContent() {
                     isValidating: false,
                     createdId: result.id
                 });
-                window.open(authResult.authorization_url, '_blank');
-                showAlert("Please complete the authorization in the new tab.");
+
+                const width = 600;
+                const height = 700;
+                const left = window.screenX + (window.outerWidth - width) / 2;
+                const top = window.screenY + (window.outerHeight - height) / 2;
+
+                window.open(
+                    authResult.authorization_url,
+                    'Authorize Service',
+                    `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+                );
+                showAlert("Please complete the authorization in the popup.");
             } else {
                 throw new Error("Authorization failed: No URL provided");
             }
@@ -696,8 +715,18 @@ function ZapsEditorContent() {
                     isValidating: false,
                     createdId: result.id
                 });
-                window.open(authResult.authorization_url, '_blank');
-                showAlert("Please complete the authorization in the new tab.");
+
+                const width = 600;
+                const height = 700;
+                const left = window.screenX + (window.outerWidth - width) / 2;
+                const top = window.screenY + (window.outerHeight - height) / 2;
+
+                window.open(
+                    authResult.authorization_url,
+                    'Authorize Service',
+                    `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+                );
+                showAlert("Please complete the authorization in the popup.");
             } else {
                 throw new Error("Authorization failed: No URL provided");
             }
@@ -961,7 +990,7 @@ function ZapsEditorContent() {
                                         <button
                                             type="submit"
                                             disabled={isCreatingArea || !zapName.trim()}
-                                            className="px-4 py-2 bg-[#f66d32] cursor-pointer text-white rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium disabled:opacity-50 flex items-center gap-2"
+                                            className="px-4 py-2 bg-[#1DD3C3] cursor-pointer text-white rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium disabled:opacity-50 flex items-center gap-2"
                                         >
                                             {isCreatingArea ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
                                             Save
@@ -971,7 +1000,7 @@ function ZapsEditorContent() {
                             ) : (
                                 <h1
                                     onClick={() => setIsEditingName(true)}
-                                    className="text-4xl text-[#f66d32] font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text cursor-pointer hover:opacity-80 transition-opacity"
+                                    className="text-4xl text-[#1DD3C3] font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text cursor-pointer hover:opacity-80 transition-opacity"
                                 >
                                     {zapName}
                                 </h1>
@@ -1062,8 +1091,8 @@ function ZapsEditorContent() {
                                                         disabled={isLastTrigger}
                                                         title={isLastTrigger ? "Cannot delete the last trigger" : "Delete step"}
                                                         className={`p-2 rounded-lg transition-colors ${isLastTrigger
-                                                                ? 'text-gray-300 cursor-not-allowed'
-                                                                : 'text-red-600 hover:bg-red-100 cursor-pointer'
+                                                            ? 'text-gray-300 cursor-not-allowed'
+                                                            : 'text-red-600 hover:bg-red-100 cursor-pointer'
                                                             }`}
                                                     >
                                                         <Trash2 className="w-5 h-5" />
@@ -1236,7 +1265,7 @@ function ZapsEditorContent() {
                             </button>
                             <button
                                 onClick={handleConsentConfirm}
-                                className="px-4 py-2 bg-[#f66d32] hover:bg-[#f66d32]/60 text-white rounded-xl transition-colors font-medium shadow-lg shadow-purple-600/20"
+                                className="px-4 py-2 bg-[#1DD3C3] hover:bg-[#1DD3C3]/60 text-white rounded-xl transition-colors font-medium shadow-lg shadow-purple-600/20"
                             >
                                 Confirm
                             </button>

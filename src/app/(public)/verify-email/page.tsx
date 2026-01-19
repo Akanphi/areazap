@@ -136,7 +136,7 @@ function VerifyEmailContent() {
         <div className="space-y-4">
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center border border-stone-100">
-              <Loader2 className="w-8 h-8 text-orange-600 animate-spin" />
+              <Loader2 className="w-8 h-8 text-[#1DD3C3] animate-spin" />
             </div>
           </div>
           <p className="text-gray-600 font-medium">Vérification en cours...</p>
@@ -170,7 +170,7 @@ function VerifyEmailContent() {
                       value={digit}
                       onChange={(e) => handleCodeChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
-                      className="w-12 h-14 text-center text-2xl font-bold bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-orange-600 focus:ring-0 transition-all outline-none text-gray-900"
+                      className="w-12 h-14 text-center text-2xl font-bold bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-[#1DD3C3] focus:ring-0 transition-all outline-none text-gray-900"
                       autoFocus={index === 0}
                     />
                   ))}
@@ -187,7 +187,7 @@ function VerifyEmailContent() {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-orange-600 focus:ring-0 transition-all outline-none text-gray-900"
+                      className="w-full px-4 py-3 bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-[#1DD3C3] focus:ring-0 transition-all outline-none text-gray-900"
                       placeholder="••••••••"
                       required
                       minLength={8}
@@ -207,7 +207,7 @@ function VerifyEmailContent() {
                     type={showPassword ? "text" : "password"}
                     value={passwordConfirmation}
                     onChange={(e) => setPasswordConfirmation(e.target.value)}
-                    className="w-full px-4 py-3 bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-orange-600 focus:ring-0 transition-all outline-none text-gray-900"
+                    className="w-full px-4 py-3 bg-stone-50 border-2 border-stone-100 rounded-xl focus:border-[#1DD3C3] focus:ring-0 transition-all outline-none text-gray-900"
                     placeholder="••••••••"
                     required
                     minLength={8}
@@ -219,7 +219,7 @@ function VerifyEmailContent() {
             <button
               type="submit"
               disabled={isLoading || (!tokenFromUrl && code.join("").length !== 6) || (purpose === 'Reset_password' && (!password || password !== passwordConfirmation))}
-              className="w-full py-4 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-600/20"
+              className="w-full py-4 bg-[#1DD3C3] hover:bg-[#00E5CC] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg shadow-[#1DD3C3]/20"
             >
               {isLoading ? "Traitement..." : (purpose === 'Reset_password' ? "Réinitialiser" : "Vérifier")}
             </button>
@@ -231,7 +231,7 @@ function VerifyEmailContent() {
               <button
                 onClick={handleResendCode}
                 disabled={resendLoading}
-                className="text-orange-600 hover:text-orange-700 font-semibold text-sm transition-colors disabled:opacity-50"
+                className="text-[#1DD3C3] hover:text-[#00E5CC] font-semibold text-sm transition-colors disabled:opacity-50"
               >
                 {resendLoading ? "Envoi en cours..." : "Renvoyer le code"}
               </button>
@@ -282,7 +282,7 @@ function VerifyEmailContent() {
 export default function VerifyEmail() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 p-4">
-      <Suspense fallback={<Loader2 className="w-10 h-10 text-orange-600 animate-spin" />}>
+      <Suspense fallback={<Loader2 className="w-10 h-10 text-[#1DD3C3] animate-spin" />}>
         <VerifyEmailContent />
       </Suspense>
     </div>

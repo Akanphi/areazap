@@ -81,27 +81,46 @@ export default function Register() {
         });
     };
 
-    const handleSocialLogin = (provider: string) => {
-        const authUrl = `/auth/initiate?provider=${provider}`;
+    const handleSocialLogin = (provider: 'google' | 'github') => {
+        const { openOAuthPopup } = require('@/config/oauth.config');
 
-        const width = 600;
-        const height = 700;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
+        const popup = openOAuthPopup(provider, 'register');
 
-        window.open(
-            authUrl,
-            `Register with ${provider}`,
-            `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
-        );
+        if (!popup) {
+            setError('Failed to open authentication window. Please check your popup blocker settings.');
+            return;
+        }
 
         const handleMessage = async (event: MessageEvent) => {
-            if (event.origin !== window.location.origin) return;
+            console.log("[Register] Message received:", event);
+            console.log("[Register] Event origin:", event.origin);
+            console.log("[Register] Window origin:", window.location.origin);
+            console.log("[Register] Event data:", event.data);
+
+            if (event.origin !== window.location.origin) {
+                console.warn("[Register] Origin mismatch - message ignored");
+                return;
+            }
+
+            console.log("Google return : ", event.data);
             if (event.data.type === "OAUTH_SUCCESS") {
-                if (event.data.isAuthenticated) {
+                const { access, refresh, user } = event.data;
+
+                if (access) {
+                    // Store credentials
+                    localStorage.setItem('access', access);
+                    if (refresh) {
+                        localStorage.setItem('refresh', refresh);
+                    }
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+
+                    // Refresh profile and redirect
                     await refreshProfile();
                     router.push('/dashboard');
                 }
+
                 window.removeEventListener("message", handleMessage);
             } else if (event.data.type === "OAUTH_ERROR") {
                 setError(event.data.error || "Authentication failed");
@@ -110,6 +129,14 @@ export default function Register() {
         };
 
         window.addEventListener("message", handleMessage);
+
+        // Cleanup listener if popup is closed without completing auth
+        const checkPopupClosed = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(checkPopupClosed);
+                window.removeEventListener("message", handleMessage);
+            }
+        }, 1000);
     };
 
     return (
@@ -239,7 +266,7 @@ export default function Register() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full cursor-pointer bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20"
+                                className="w-full cursor-pointer bg-[#1DD3C3] hover:bg-[#00E5CC] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#1DD3C3]/20"
                             >
                                 {isLoading ? (
                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

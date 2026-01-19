@@ -35,7 +35,7 @@ export default function IntegrationsPage() {
                                     fill
                                     className="object-contain"
                                     onError={(e) => {
-                                        
+
                                     }}
                                 />
                             </div>
@@ -45,7 +45,7 @@ export default function IntegrationsPage() {
                     ))}
                 </div>
 
-                <div className="mt-16 text-center bg-[#f66d32] rounded-2xl p-12 text-white">
+                <div className="mt-16 text-center bg-[#1DD3C3] rounded-2xl p-12 text-white">
                     <h2 className="text-3xl font-bold mb-4">Don't see your app?</h2>
                     <p className="text-purple-100 mb-8 max-w-xl mx-auto">
                         We're constantly adding new integrations. You can build your own using our Developer Platform or request a new integration.

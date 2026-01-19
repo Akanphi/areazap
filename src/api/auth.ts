@@ -111,6 +111,10 @@ export const verifyEmail = async (data: TokenActionRequest): Promise<void> => {
   await api.post('token-action/', data);
 };
 
+export const validateTokenAndResetPassword = async (data: TokenActionRequest): Promise<void> => {
+  await api.post('token-action/', data);
+};
+
 export const login = async (data: LoginData): Promise<LoginSuccess> => {
   console.log("Attempting login with:", { email: data.email, passwordLength: data.password.length });
   try {

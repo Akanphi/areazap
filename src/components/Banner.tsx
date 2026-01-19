@@ -11,14 +11,14 @@ export const Banner = () => {
             <nav className="flex flex-wrap justify-between items-center gap-4">
                 <Link href="/" className="flex items-end gap-2 hover:opacity-80 transition-opacity">
                     <Image
-                        className="dark:invert"
-                        src="/logo.svg"
+                        src="/logo.png"
                         alt="Area logo"
-                        width={100}
-                        height={20}
+                        width={70}
+                        height={0}
+                        style={{ height: 'auto' }}
                         priority
                     />
-                    <h1 className="text-3xl sm:text-4xl pb-1 font-bold text-orange-600">
+                    <h1 className="text-2xl sm:text-2xl pb-1 font-bold">
                         Area
                     </h1>
                 </Link>
@@ -55,7 +55,7 @@ export const Banner = () => {
                     {isAuthenticated ? (
                         <Link
                             href="/dashboard"
-                            className="px-6 py-2 bg-orange-600 text-white font-medium rounded-full hover:bg-orange-700 transition-colors shadow-sm"
+                            className="px-6 py-2 bg-[#1DD3C3] text-white font-medium rounded-full hover:bg-[#00E5CC] transition-colors shadow-sm"
                         >
                             Dashboard
                         </Link>
@@ -63,13 +63,13 @@ export const Banner = () => {
                         <>
                             <Link
                                 href="/login"
-                                className="px-4 py-2 font-medium hover:text-orange-600 transition-colors"
+                                className="px-4 py-2 font-medium hover:text-[#1DD3C3] transition-colors"
                             >
                                 Login
                             </Link>
                             <Link
                                 href="/register"
-                                className="px-6 py-2 bg-orange-600 text-white font-medium rounded-full hover:bg-orange-700 transition-colors shadow-sm"
+                                className="px-6 py-2 bg-[#1DD3C3] text-white font-medium rounded-full hover:bg-[#00E5CC] transition-colors shadow-sm"
                             >
                                 Sign Up
                             </Link>

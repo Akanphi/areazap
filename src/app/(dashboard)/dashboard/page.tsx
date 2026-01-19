@@ -234,6 +234,10 @@ export default function AdminDashboard() {
     );
   }
 
+  const totos = zapsByCategory.reduce(
+    (acc, aris) => acc + aris.executions,
+    0
+  );
   if (error) {
     return (
       <div className="p-6 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-purple-50/30 to-pink-50/20">
@@ -275,7 +279,7 @@ export default function AdminDashboard() {
             <h3 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               {metrics.totalZaps}
             </h3>
-            <p className="text-sm text-gray-600 font-medium">Total Zaps</p>
+            <p className="text-sm text-gray-600 font-medium">Total Areas</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-green-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
@@ -288,7 +292,7 @@ export default function AdminDashboard() {
               </span>
             </div>
             <h3 className="text-3xl font-bold text-green-600">
-              {formatNumber(metrics.totalExecutions)}
+              {totos}
             </h3>
             <p className="text-sm text-gray-600 font-medium">Total Executions</p>
           </div>
@@ -305,13 +309,13 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-600 font-medium">Success Rate</p>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-orange-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-[#1DD3C3]/20 hover:shadow-xl transition-all duration-300 hover:scale-105">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100">
-                <Clock className="w-6 h-6 text-orange-600" />
+              <div className="p-3 rounded-xl bg-[#1DD3C3]/10">
+                <Clock className="w-6 h-6 text-[#1DD3C3]" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-orange-600">
+            <h3 className="text-3xl font-bold text-[#1DD3C3]">
               {metrics.avgExecutionTime}s
             </h3>
             <p className="text-sm text-gray-600 font-medium">Avg Execution Time</p>
@@ -441,7 +445,7 @@ export default function AdminDashboard() {
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-100 mb-8">
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Zaps Overview</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Areas Overview</h3>
               <div className="flex items-center gap-3">
                 <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">
                   <Filter className="w-4 h-4" />
@@ -459,7 +463,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Zaps by Category */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4">Zaps by Category</h4>
+                <h4 className="text-md font-medium text-gray-900 mb-4">Area by Category</h4>
                 <div className="space-y-3">
                   {zapsByCategory.map((category, index) => (
                     <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-purple-50/30 hover:shadow-md transition-all duration-300 border border-gray-100">
@@ -488,7 +492,7 @@ export default function AdminDashboard() {
                   {topPerformers.map((zap, index) => (
                     <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-green-50/30 hover:shadow-md transition-all duration-300 border border-gray-100">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-[#F66D32] flex items-center justify-center text-white font-bold text-sm shadow-md">
+                        <div className="w-12 h-12 rounded-xl bg-[#1DD3C3] flex items-center justify-center text-white font-bold text-sm shadow-md">
                           {zap.logo}
                         </div>
                         <div>
@@ -498,13 +502,13 @@ export default function AdminDashboard() {
                       </div>
                       <div className="text-right">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`font-semibold text-sm ${parseFloat(zap.successRate) >= 98 ? 'text-green-600' : 'text-orange-600'}`}>
+                          <span className={`font-semibold text-sm ${parseFloat(zap.successRate) >= 98 ? 'text-green-600' : 'text-[#1DD3C3]'}`}>
                             {zap.successRate}%
                           </span>
                           {zap.trend === 'up' ? (
                             <ArrowUpRight className="w-4 h-4 text-green-600" />
                           ) : (
-                            <ArrowDownRight className="w-4 h-4 text-orange-600" />
+                            <ArrowDownRight className="w-4 h-4 text-[#1DD3C3]" />
                           )}
                         </div>
                         <p className="text-xs text-gray-600">{formatNumber(zap.executions)} runs • {zap.avgTime}s avg</p>

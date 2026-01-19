@@ -345,7 +345,7 @@ export default function ZapsManagerPage() {
 
                     <div className="bg-white/90 backdrop-blur-xl p-5 sm:p-6 rounded-2xl shadow-lg border-2 border-amber-100 hover:shadow-2xl hover:border-amber-200 transition-all duration-300 group">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 sm:p-3.5 rounded-xl bg-linear-to-br from-amber-100 via-orange-50 to-red-100 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                            <div className="p-3 sm:p-3.5 rounded-xl bg-linear-to-br from-[#1DD3C3]/20 via-[#00E5CC]/20 to-purple-100 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                                 <Pause className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
                             </div>
                             <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
@@ -405,7 +405,7 @@ export default function ZapsManagerPage() {
                                 <div className={`h-2 ${area.status === AreaStatus.ACTIVE
                                     ? 'bg-linear-to-r from-emerald-400 via-green-500 to-teal-500'
                                     : area.status === AreaStatus.DISABLED
-                                        ? 'bg-linear-to-r from-amber-400 via-orange-500 to-red-400'
+                                        ? 'bg-linear-to-r from-[#1DD3C3] via-[#00E5CC] to-purple-400'
                                         : 'bg-linear-to-r from-orange-500 from- via-sky-900 via-'
                                     }`} />
 
@@ -413,7 +413,7 @@ export default function ZapsManagerPage() {
                                     {/* Header */}
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="flex-1 min-w-0 pr-3">
-                                            <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#f66d32] transition-colors leading-tight">
+                                            <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#1DD3C3] transition-colors leading-tight">
                                                 {area.name}
                                             </h3>
                                             <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">

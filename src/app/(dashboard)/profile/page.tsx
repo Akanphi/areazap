@@ -57,10 +57,10 @@ export default function ProfilePage() {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
-        
+
         // Simuler un appel API
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
         setIsSaving(false);
         setIsEditing(false);
         setShowSuccess(true);
@@ -70,13 +70,13 @@ export default function ProfilePage() {
     const stats = [
         { label: "Automatisations", value: "12", icon: Activity, color: "from-blue-500 to-cyan-500" },
         { label: "Services connectés", value: "8", icon: Globe, color: "from-purple-500 to-pink-500" },
-        { label: "Temps économisé", value: "24h", icon: Clock, color: "from-orange-500 to-red-500" }
+        { label: "Temps économisé", value: "24h", icon: Clock, color: "from-[#1DD3C3] to-[#00E5CC]" }
     ];
 
     return (
         <div className="p-4 md:p-8 min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-purple-50/30">
             <div className="max-w-7xl mx-auto">
-                
+
                 {/* Notification de succès */}
                 {showSuccess && (
                     <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 backdrop-blur-xl">
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                             </button>
                             <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white shadow-lg"></div>
                         </div>
-                        
+
                         <div className="mb-6 md:mb-8">
                             <div className="flex items-center gap-3 mb-2">
                                 <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
@@ -151,11 +151,10 @@ export default function ProfilePage() {
                     <div className="absolute bottom-6 right-6 md:right-10 flex gap-3">
                         <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className={`px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 shadow-xl ${
-                                isEditing 
-                                ? "bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30" 
-                                : "bg-white text-gray-900 hover:bg-gray-50 hover:shadow-2xl active:scale-95"
-                            }`}
+                            className={`px-6 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 shadow-xl ${isEditing
+                                    ? "bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white/30"
+                                    : "bg-white text-gray-900 hover:bg-gray-50 hover:shadow-2xl active:scale-95"
+                                }`}
                         >
                             {isEditing ? "Annuler" : "Modifier le profil"}
                         </button>
@@ -165,7 +164,7 @@ export default function ProfilePage() {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     {stats.map((stat, index) => (
-                        <div 
+                        <div
                             key={index}
                             className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/50 hover:shadow-xl transition-all group cursor-pointer"
                         >
@@ -204,7 +203,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4 group cursor-pointer hover:bg-gray-50 p-3 rounded-2xl transition-all -ml-3">
-                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white shadow-md group-hover:scale-110 group-hover:rotate-6 transition-transform flex-shrink-0">
+                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1DD3C3] to-[#00E5CC] flex items-center justify-center text-white shadow-md group-hover:scale-110 group-hover:rotate-6 transition-transform flex-shrink-0">
                                         <MapPin className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -235,7 +234,7 @@ export default function ProfilePage() {
                                     { name: 'Twitter', icon: Twitter, color: 'from-blue-400 to-blue-600', url: '#' },
                                     { name: 'Github', icon: Github, color: 'from-gray-700 to-gray-900', url: '#' }
                                 ].map((social) => (
-                                    <button 
+                                    <button
                                         key={social.name}
                                         className="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all group border border-transparent hover:border-purple-200"
                                     >
@@ -292,7 +291,7 @@ export default function ProfilePage() {
                                         <input
                                             disabled={!isEditing}
                                             value={formData.firstName}
-                                            onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                             className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-purple-400 outline-none transition-all disabled:opacity-50 font-semibold text-gray-700 shadow-sm hover:border-gray-200"
                                         />
                                     </div>
@@ -304,7 +303,7 @@ export default function ProfilePage() {
                                         <input
                                             disabled={!isEditing}
                                             value={formData.lastName}
-                                            onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                             className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-purple-400 outline-none transition-all disabled:opacity-50 font-semibold text-gray-700 shadow-sm hover:border-gray-200"
                                         />
                                     </div>
@@ -320,7 +319,7 @@ export default function ProfilePage() {
                                             disabled={!isEditing}
                                             type="url"
                                             value={formData.website}
-                                            onChange={(e) => setFormData({...formData, website: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                                             placeholder="https://votre-site.com"
                                             className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-purple-400 outline-none transition-all disabled:opacity-50 font-semibold text-gray-700 shadow-sm hover:border-gray-200"
                                         />
@@ -334,7 +333,7 @@ export default function ProfilePage() {
                                             disabled={!isEditing}
                                             type="tel"
                                             value={formData.phone}
-                                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                             placeholder="+33 6 12 34 56 78"
                                             className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-purple-400 outline-none transition-all disabled:opacity-50 font-semibold text-gray-700 shadow-sm hover:border-gray-200"
                                         />
@@ -347,7 +346,7 @@ export default function ProfilePage() {
                                         disabled={!isEditing}
                                         rows={5}
                                         value={formData.bio}
-                                        onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                                        onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                                         placeholder="Parlez-nous de vous..."
                                         className="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-purple-400 outline-none transition-all disabled:opacity-50 font-semibold text-gray-700 resize-none shadow-sm hover:border-gray-200"
                                     ></textarea>
@@ -356,14 +355,14 @@ export default function ProfilePage() {
 
                                 {isEditing && (
                                     <div className="flex justify-end gap-3 pt-4 animate-in fade-in slide-in-from-bottom-4">
-                                        <button 
+                                        <button
                                             type="button"
                                             onClick={() => setIsEditing(false)}
                                             className="px-8 py-4 bg-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-gray-200 transition-all active:scale-95"
                                         >
                                             Annuler
                                         </button>
-                                        <button 
+                                        <button
                                             type="submit"
                                             disabled={isSaving}
                                             className="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all shadow-xl shadow-purple-200 disabled:opacity-70 active:scale-95"
@@ -425,14 +424,14 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-6 rounded-3xl bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-100 flex items-center justify-between group hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer">
+                                <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1DD3C3]/5 to-purple-50 border-2 border-[#1DD3C3]/20 flex items-center justify-between group hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-orange-600">
+                                        <div className="w-14 h-14 rounded-2xl bg-white shadow-md flex items-center justify-center text-[#1DD3C3]">
                                             <Activity className="w-7 h-7" />
                                         </div>
                                         <div>
                                             <p className="text-sm font-black text-gray-900">Dernière connexion</p>
-                                            <p className="text-xs text-orange-600 font-bold">Il y a 2 minutes</p>
+                                            <p className="text-xs text-[#1DD3C3] font-bold">Il y a 2 minutes</p>
                                         </div>
                                     </div>
                                 </div>
