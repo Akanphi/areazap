@@ -87,22 +87,45 @@ function OAuthCallbackContent() {
                 // Send success to parent with just the token response for now
                 sendSuccessToParent({
                     provider: 'google',
-                    token_response: tokenResponse
+                    token_response: tokenResponse,
+                    state: state
                 });
 
-                // Commented out backend submission as requested
-                /*
                 setMessage('Sending access token to server...');
                 setProgress(50);
 
                 // Submit access token to backend
                 const sessionResponse = await submitOAuthCode({
-                    code: tokenResponse.access_token, // Send access token instead of auth code
+                    id_token: tokenResponse.id_token || tokenResponse.access_token, // Send id_token (Google) or access_token (GitHub)
                     state,
                     provider,
                 });
 
                 const sessionId = sessionResponse.session_id;
+
+                // Check if tokens are already present (direct response)
+                if (sessionResponse.access && sessionResponse.user) {
+                    console.log('✅ Backend returned tokens directly, skipping polling.');
+                    setStatus('success');
+                    setMessage('Successfully authenticated!');
+                    setProgress(100);
+
+                    sendSuccessToParent({
+                        access: sessionResponse.access,
+                        refresh: sessionResponse.refresh,
+                        user: sessionResponse.user,
+                    });
+
+                    setTimeout(() => {
+                        window.close();
+                    }, 1500);
+                    return;
+                }
+
+                if (!sessionId) {
+                    throw new Error('No session ID or tokens received from backend');
+                }
+
                 setMessage('Waiting for authentication...');
                 setProgress(70);
 
@@ -130,7 +153,7 @@ function OAuthCallbackContent() {
                     setMessage(credentials.error || 'Authentication failed');
                     sendErrorToParent(credentials.error || 'Authentication failed');
                 }
-                */
+
             } catch (error: any) {
                 console.error('OAuth callback error:', error);
                 setStatus('error');
@@ -202,18 +225,37 @@ function OAuthCallbackContent() {
         console.log('[OAuth Callback] window.opener exists:', !!window.opener);
         console.log('[OAuth Callback] Credentials:', credentials);
 
+        const message = {
+            type: 'OAUTH_SUCCESS',
+            ...credentials,
+        };
+
+        // Fallback: Store in localStorage for parent to pick up
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('oauth_result', JSON.stringify(message));
+            // Trigger storage event manually for same-window listeners if needed
+            // but usually parent is another window
+        }
+
+        // Try BroadcastChannel as another fallback
+        try {
+            const channel = new BroadcastChannel('oauth_channel');
+            channel.postMessage(message);
+            channel.close();
+            console.log('[OAuth Callback] Message sent via BroadcastChannel');
+        } catch (e) {
+            console.warn('[OAuth Callback] BroadcastChannel not supported or failed');
+        }
+
         if (window.opener) {
             try {
-                window.opener.postMessage({
-                    type: 'OAUTH_SUCCESS',
-                    ...credentials,
-                }, window.location.origin);
-                console.log('[OAuth Callback] Message sent successfully');
+                window.opener.postMessage(message, window.location.origin);
+                console.log('[OAuth Callback] Message sent via postMessage');
             } catch (error) {
                 console.error('[OAuth Callback] Failed to send message:', error);
             }
         } else {
-            console.error('[OAuth Callback] window.opener is null - popup may have lost parent reference');
+            console.error('[OAuth Callback] window.opener is null - using fallbacks (localStorage/BroadcastChannel)');
         }
     };
 
@@ -224,18 +266,31 @@ function OAuthCallbackContent() {
         console.log('[OAuth Callback] Attempting to send error to parent:', error);
         console.log('[OAuth Callback] window.opener exists:', !!window.opener);
 
+        const message = {
+            type: 'OAUTH_ERROR',
+            error,
+        };
+
+        // Fallback
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('oauth_result', JSON.stringify(message));
+        }
+
+        try {
+            const channel = new BroadcastChannel('oauth_channel');
+            channel.postMessage(message);
+            channel.close();
+        } catch (e) { }
+
         if (window.opener) {
             try {
-                window.opener.postMessage({
-                    type: 'OAUTH_ERROR',
-                    error,
-                }, window.location.origin);
+                window.opener.postMessage(message, window.location.origin);
                 console.log('[OAuth Callback] Error message sent successfully');
             } catch (error) {
                 console.error('[OAuth Callback] Failed to send error message:', error);
             }
         } else {
-            console.error('[OAuth Callback] window.opener is null');
+            console.error('[OAuth Callback] window.opener is null - using fallbacks');
         }
     };
 

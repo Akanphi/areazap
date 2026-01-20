@@ -78,18 +78,18 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
         }
       },
       merge_request_iid: {
-          endpoint: "gitlab/user/merge-requests/",
-          parameter: "project_id",
-          dependency: "project_id",
-          transformResponse: (data: any) => (data.merge_requests || []).map((mr: string) => ({ label: mr, value: mr }))
+        endpoint: "gitlab/user/merge-requests/",
+        parameter: "project_id",
+        dependency: "project_id",
+        transformResponse: (data: any) => (data.merge_requests || []).map((mr: string) => ({ label: mr, value: mr }))
       },
       branch: {
         endpoint: "gitlab/user/branches/",
         parameter: "project_id",
         dependency: "project_id",
-        transformResponse: (data: any) => (data.branches || []).map((c: any) => ({ label: c, value:  c}))
+        transformResponse: (data: any) => (data.branches || []).map((c: any) => ({ label: c, value: c }))
       },
-      issue_iid: { 
+      issue_iid: {
         endpoint: "gitlab/user/issues/",
         parameter: "project_id",
         dependency: "project_id",
@@ -103,6 +103,34 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
         endpoint: "gitlab/users/",
         transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((u: any) => ({ label: u.login || u, value: u.login || u }))
       },
+    },
+    linear: {
+      team_id: {
+        endpoint: "linear/teams/",
+        transformResponse: (data: any) => (data.teams || []).map((t: any) => ({ label: t.name || t, value: t.id || t }))
+      },
+      issue_id: {
+        endpoint: "linear/issues/",
+        transformResponse: (data: any) => {
+          const issues = data.issues || data;
+          return (Array.isArray(issues) ? issues : []).map((t: any) => ({
+            label: t.display || t.display || t.id?.toString() || t.toString(),
+            value: t.id?.toString() || t.toString()
+          }));
+        }
+      },
+      assignee_id: {
+        endpoint: "linear/teams/members/",
+        parameter: "team_id",
+        dependency: "team_id",
+        transformResponse: (data: any) => (data.members || []).map((t: any) => ({ label: t.name || t, value: t.id || t }))
+      },
+      state_id: {
+        endpoint: "linear/teams/workflow-states/",
+        parameter: "team_id",
+        dependency: "team_id",
+        transformResponse: (data: any) => (data.states || []).map((t: any) => ({ label: t.name || t, value: t.id || t }))
+      }
     },
   },
   action: {
@@ -167,18 +195,18 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
         dependency: "project_id",
         transformResponse: (data: any) => (data.merge_requests || []).map((mr: string, index: string) => ({ label: mr, value: index }))
       },
-     branch: {
+      branch: {
         endpoint: "gitlab/user/branches/",
         parameter: "project_id",
         dependency: "project_id",
-        transformResponse: (data: any) => (data.branches || []).map((c: any) => ({ label: c, value:  c}))
+        transformResponse: (data: any) => (data.branches || []).map((c: any) => ({ label: c, value: c }))
       },
       assignee: {
         endpoint: "gitlab/users/",
 
         transformResponse: (data: any) => (Array.isArray(data) ? data : []).map((u: any) => ({ label: u.login || u, value: u.login || u }))
       },
-      issue_iid: { 
+      issue_iid: {
         endpoint: "gitlab/user/issues/",
         parameter: "project_id",
         dependency: "project_id",
@@ -219,12 +247,52 @@ const FIELD_ENDPOINTS: Record<string, Record<string, Record<string, EndpointConf
           console.log("Todoist Tasks Raw Data:", data);
           const tasks = data.tasks || data;
           return (Array.isArray(tasks) ? tasks : []).map((t: any) => ({
-            label: t.content || t.name || t.id?.toString() || t.toString(),
+            label: t.display || t.name || t.id?.toString() || t.toString(),
             value: t.id?.toString() || t.toString()
           }));
         }
       },
     },
+    linear: {
+      team_id: {
+        endpoint: "linear/teams/",
+        transformResponse: (data: any) => (data.teams || []).map((t: any) => ({ label: t.name || t, value: t.id || t }))
+      },
+      issue_id: {
+        endpoint: "linear/issues/",
+        transformResponse: (data: any) => {
+          const issues = data.issues || data;
+          return (Array.isArray(issues) ? issues : []).map((t: any) => ({
+            label: t.display || t.display || t.id?.toString() || t.toString(),
+            value: t.id?.toString() || t.toString()
+          }));
+        }
+      },
+      assignee_id: {
+        endpoint: "linear/teams/members/",
+        parameter: "team_id",
+        dependency: "team_id",
+        transformResponse: (data: any) => (data.members || []).map((t: any) => ({ label: t.name || t, value: t.id || t }))
+      },
+      state_id: {
+        endpoint: "linear/teams/workflow-states/",
+        parameter: "team_id",
+        dependency: "team_id",
+        transformResponse: (data: any) => (data.states || []).map((t: any) => ({ label: t.name || t, value: t.id || t }))
+      }
+    },
+    miro: {
+      board_id: {
+        endpoint: "miro/boards/",
+        transformResponse: (data: any) => {
+          const boards = data.boards || data;
+          return (Array.isArray(boards) ? boards : []).map((t: any) => ({
+            label: t.display || t.display || t.id?.toString() || t.toString(),
+            value: t.id?.toString() || t.toString()
+          }));
+        }
+      }
+    }
   },
 };
 
@@ -283,6 +351,62 @@ const useDynamicOptions = (field: ConfigMap, value: string, allValues: Record<st
 };
 
 export const ConfigField = ({ field, value, onChange, fallback, allValues }: Props) => {
+  if (field.field === 'due_date') {
+    return (
+      <input
+        type="date"
+        name={field.field}
+        required={field.required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-purple-100 transition-all bg-white text-gray-900"
+      />
+    );
+  }
+
+  if (field.field === 'time') {
+    return (
+      <input
+        type="time"
+        name={field.field}
+        required={field.required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-purple-100 transition-all bg-white text-gray-900"
+      />
+    );
+  }
+
+  if (field.field === 'days') {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const selectedDays = value ? value.split(',').map(d => d.trim()) : [];
+
+    const toggleDay = (day: string) => {
+      const newSelected = selectedDays.includes(day)
+        ? selectedDays.filter(d => d !== day)
+        : [...selectedDays, day];
+      onChange(newSelected.join(','));
+    };
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {days.map(day => (
+          <button
+            key={day}
+            type="button"
+            onClick={() => toggleDay(day)}
+            className={`px-3 py-1 rounded-full text-sm border transition-all ${selectedDays.includes(day)
+              ? 'bg-purple-100 border-purple-300 text-purple-700'
+              : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+              }`}
+          >
+            {day}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   const { options, loading, error } = useDynamicOptions(field, value, allValues);
 
   if (loading) {
@@ -293,7 +417,18 @@ export const ConfigField = ({ field, value, onChange, fallback, allValues }: Pro
     );
   }
 
-  if (error || !options || !Array.isArray(options) || options.length === 0) {
+  if (error) {
+    return (
+      <div className="space-y-2">
+        {fallback}
+        <p className="text-xs text-red-500 flex items-center gap-1">
+          <span>⚠️</span> Failed to load dynamic options. Using manual input.
+        </p>
+      </div>
+    );
+  }
+
+  if (!options || !Array.isArray(options) || options.length === 0) {
     return <>{fallback}</>;
   }
 

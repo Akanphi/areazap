@@ -15,6 +15,7 @@ import { register } from "@/api/auth";
 import { useAuth } from "@/contexts/AuthContext";
 import AlertError from "@/components/ui/AlertError";
 import { API_URL } from "@/api/api";
+import { submitOAuthCode, pollOAuthSession } from "@/api/services";
 
 export default function Register() {
     const router = useRouter();
@@ -92,10 +93,6 @@ export default function Register() {
         }
 
         const handleMessage = async (event: MessageEvent) => {
-            console.log("[Register] Message received:", event);
-            console.log("[Register] Event origin:", event.origin);
-            console.log("[Register] Window origin:", window.location.origin);
-            console.log("[Register] Event data:", event.data);
 
             if (event.origin !== window.location.origin) {
                 console.warn("[Register] Origin mismatch - message ignored");
@@ -104,21 +101,79 @@ export default function Register() {
 
             console.log("Google return : ", event.data);
             if (event.data.type === "OAUTH_SUCCESS") {
-                const { access, refresh, user } = event.data;
+                const { token_response, state, provider } = event.data;
 
-                if (access) {
-                    // Store credentials
-                    localStorage.setItem('access', access);
-                    if (refresh) {
-                        localStorage.setItem('refresh', refresh);
-                    }
-                    if (user) {
-                        localStorage.setItem('user', JSON.stringify(user));
-                    }
+                if (token_response && token_response.access_token) {
+                    try {
+                        // Submit token to backend
+                        const sessionResponse = await submitOAuthCode({
+                            id_token: token_response.id_token || token_response.access_token,
+                            state: state || 'state', // Fallback if missing
+                            provider: provider || 'google'
+                        });
 
-                    // Refresh profile and redirect
-                    await refreshProfile();
-                    router.push('/dashboard');
+                        const sessionId = sessionResponse.session_id;
+
+                        if (!sessionId) {
+                            // If no session ID, maybe it returned tokens directly?
+                            // But register page seems to expect session_id for polling.
+                            // Let's handle direct tokens if they exist.
+                            const anyResponse = sessionResponse as any;
+                            if (anyResponse.access) {
+                                localStorage.setItem('access', anyResponse.access);
+                                if (anyResponse.refresh) localStorage.setItem('refresh', anyResponse.refresh);
+                                if (anyResponse.user) localStorage.setItem('user', JSON.stringify(anyResponse.user));
+                                await refreshProfile();
+                                router.push('/dashboard');
+                                return;
+                            }
+                            throw new Error("No session ID or tokens received");
+                        }
+
+                        // Poll for session credentials
+                        const pollForCredentials = async (sessionId: string, maxAttempts = 30, interval = 1000) => {
+                            let attempts = 0;
+                            while (attempts < maxAttempts) {
+                                try {
+                                    const response = await pollOAuthSession(sessionId);
+                                    if (response.status === 'success') {
+                                        return response;
+                                    } else if (response.status === 'error') {
+                                        return response;
+                                    }
+                                    await new Promise(resolve => setTimeout(resolve, interval));
+                                    attempts++;
+                                } catch (error) {
+                                    console.error('Polling error:', error);
+                                    attempts++;
+                                    await new Promise(resolve => setTimeout(resolve, interval));
+                                }
+                            }
+                            return { status: 'error' as const, error: 'Authentication timeout' };
+                        };
+
+                        const credentials = await pollForCredentials(sessionId);
+
+                        if (credentials.status === 'success' && credentials.access) {
+                            // Store credentials
+                            localStorage.setItem('access', credentials.access);
+                            if (credentials.refresh) {
+                                localStorage.setItem('refresh', credentials.refresh);
+                            }
+                            if (credentials.user) {
+                                localStorage.setItem('user', JSON.stringify(credentials.user));
+                            }
+
+                            // Refresh profile and redirect
+                            await refreshProfile();
+                            router.push('/dashboard');
+                        } else {
+                            setError(credentials.error || "Authentication failed");
+                        }
+                    } catch (err) {
+                        console.error("Backend authentication failed:", err);
+                        setError("Backend authentication failed");
+                    }
                 }
 
                 window.removeEventListener("message", handleMessage);
@@ -130,11 +185,42 @@ export default function Register() {
 
         window.addEventListener("message", handleMessage);
 
+        // Fallback: Listen for storage events (localStorage)
+        const handleStorage = (event: StorageEvent) => {
+            if (event.key === 'oauth_result' && event.newValue) {
+                try {
+                    const data = JSON.parse(event.newValue);
+                    console.log("[Register] Received OAuth result via localStorage:", data);
+                    handleMessage({ data, origin: window.location.origin } as MessageEvent);
+                    localStorage.removeItem('oauth_result');
+                } catch (e) {
+                    console.error("[Register] Failed to parse localStorage oauth_result:", e);
+                }
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+
+        // Fallback: Listen via BroadcastChannel
+        let channel: BroadcastChannel | null = null;
+        try {
+            channel = new BroadcastChannel('oauth_channel');
+            channel.onmessage = (event) => {
+                console.log("[Register] Received OAuth result via BroadcastChannel:", event.data);
+                handleMessage(event);
+            };
+        } catch (e) {
+            console.warn("[Register] BroadcastChannel not supported");
+        }
+
         // Cleanup listener if popup is closed without completing auth
         const checkPopupClosed = setInterval(() => {
             if (popup.closed) {
                 clearInterval(checkPopupClosed);
                 window.removeEventListener("message", handleMessage);
+                window.removeEventListener('storage', handleStorage);
+                if (channel) {
+                    channel.close();
+                }
             }
         }, 1000);
     };

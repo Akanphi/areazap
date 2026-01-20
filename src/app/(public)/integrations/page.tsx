@@ -12,6 +12,9 @@ const INTEGRATIONS = [
     { name: 'Notion', icon: '/notion.svg', desc: 'Organize your workspace automatically.' },
     { name: 'Trello', icon: '/trello.svg', desc: 'Manage projects and tasks.' },
     { name: 'Spotify', icon: '/spotify.svg', desc: 'Control your music and playlists.' },
+    { name: 'Linear', icon: '/linear.svg', desc: 'Control your projects.' },
+    { name: 'Timer', icon: '/timer.svg', desc: 'Control your time without any delay.' },
+    { name: 'Miro', icon: '/miro.svg', desc: 'Organize you board.' },
 ];
 
 export default function IntegrationsPage() {
@@ -26,8 +29,8 @@ export default function IntegrationsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {INTEGRATIONS.map((app) => (
-                        <div key={app.name} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer border border-gray-100">
+                    {INTEGRATIONS.map((app, index) => (
+                        <div key={`${app.name}-${index}`} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer border border-gray-100">
                             <div className="w-12 h-12 mb-4 relative">
                                 <Image
                                     src={app.icon}

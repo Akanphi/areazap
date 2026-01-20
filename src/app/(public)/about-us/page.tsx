@@ -12,16 +12,18 @@ const FOUNDERS = [
         icon: <Code className="w-6 h-6 text-[#1DD3C3]" />,
         github: "github.com/vrmelox",
         linkedin: "linkedin.com/in/aphilippefelipemelo",
-        image: "/Philippe.png"
+        image: "/Philippe.png",
+        email: "akandeabiodoun@gmail.com"
     },
     {
         name: "A. Aimane",
         role: "Backend Engineer",
         desc: "Building the robust and scalable infrastructure that powers Area's complex automation engine.",
         icon: <Server className="w-6 h-6 text-blue-500" />,
-        github: "github.com/aimane",
-        linkedin: "linkedin.com/in/aimane",
-        image: "/Aimane.jpg"
+        github: "https://github.com/Aimane01",
+        linkedin: "https://www.linkedin.com/in/aimane-alassane",
+        image: "/Aimane.jpg",
+        email:"aimane.alassane@epitech.eu"
 
     },
     {
@@ -29,18 +31,20 @@ const FOUNDERS = [
         role: "Lead Mobile",
         desc: "Leading the mobile revolution, bringing the power of automation to your pocket with precision.",
         icon: <Smartphone className="w-6 h-6 text-purple-500" />,
-        github: "github.com/patrice",
-        linkedin: "linkedin.com/in/patrice",
-        image: "/Patrice.jpg"
+        github: "https://github.com/PatriceDAGBE",
+        linkedin: "https://www.linkedin.com/in/patrice-dagbe",
+        image: "/Patrice.jpg",
+        email: "patriko.dagbe@epitech.eu"
     },
     {
         name: "G. Amour",
         role: "Assist Mobile",
         desc: "Crafting intuitive mobile interfaces and ensuring a consistent experience across all devices.",
         icon: <Rocket className="w-6 h-6 text-pink-500" />,
-        github: "github.com/amour",
-        linkedin: "linkedin.com/in/amour",
-        image: "/Amour.jpg"
+        github: "https://github.com/amourguidi",
+        linkedin: "http://www.linkedin.com/in/amour-guidi-23462a306",
+        image: "/Amour.jpg",
+        email: "guidiamourornel@gmail.com"
     },
     {
         name: "G. Oscar",
@@ -48,8 +52,9 @@ const FOUNDERS = [
         desc: "Streamlining our deployment pipelines and ensuring the highest standards of code quality and reliability.",
         icon: <Shield className="w-6 h-6 text-green-500" />,
         github: "github.com/oscar",
-        linkedin: "linkedin.com/in/oscar",
-        image: "/Oscar.jpg"
+        linkedin: "https://www.linkedin.com/in/oscar-gbenou-34b910302",
+        image: "/Oscar.jpg",
+        email: "oscar27thgbenou@gmail.com"
     }
 ];
 
@@ -93,7 +98,7 @@ export default function AboutUsPage() {
                                     <a href={founder.linkedin} className="p-1 text-white hover:text-black hover:font-bold  transition-all">
                                         <Linkedin className="w-3 h-3" />
                                     </a>
-                                    <a href={`mailto:${founder.name.toLowerCase().replace('. ', '')}@area.com`} className="p-1 text-white hover:text-black hover:font-bold transition-all">
+                                    <a href={`mailto:${founder.email}`} className="p-1 text-white hover:text-black hover:font-bold transition-all">
                                         <Mail className="w-3 h-3" />
                                     </a>
                                 </div>

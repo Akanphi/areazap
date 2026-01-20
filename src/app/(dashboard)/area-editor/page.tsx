@@ -483,7 +483,7 @@ function ZapsEditorContent() {
         try {
             console.log(`Requesting consent for ${serviceSlug}...`);
 
-            if (serviceSlug === "google") {
+            if (serviceSlug === "google" || serviceSlug === "timer") {
                 await proceedWithService(stepId, serviceSlug);
                 return;
             }

@@ -41,6 +41,7 @@ export default function ServiceCard({
                     width={64}
                     height={64}
                     className="drop-shadow-lg"
+                    style={{ height: 'auto' }}
                 />
             </div>
 

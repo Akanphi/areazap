@@ -124,11 +124,42 @@ export default function Login() {
 
         window.addEventListener("message", handleMessage);
 
+        // Fallback: Listen for storage events (localStorage)
+        const handleStorage = (event: StorageEvent) => {
+            if (event.key === 'oauth_result' && event.newValue) {
+                try {
+                    const data = JSON.parse(event.newValue);
+                    console.log("[Login] Received OAuth result via localStorage:", data);
+                    handleMessage({ data, origin: window.location.origin } as MessageEvent);
+                    localStorage.removeItem('oauth_result');
+                } catch (e) {
+                    console.error("[Login] Failed to parse localStorage oauth_result:", e);
+                }
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+
+        // Fallback: Listen via BroadcastChannel
+        let channel: BroadcastChannel | null = null;
+        try {
+            channel = new BroadcastChannel('oauth_channel');
+            channel.onmessage = (event) => {
+                console.log("[Login] Received OAuth result via BroadcastChannel:", event.data);
+                handleMessage(event);
+            };
+        } catch (e) {
+            console.warn("[Login] BroadcastChannel not supported");
+        }
+
         // Cleanup listener if popup is closed without completing auth
         const checkPopupClosed = setInterval(() => {
             if (popup.closed) {
                 clearInterval(checkPopupClosed);
                 window.removeEventListener("message", handleMessage);
+                window.removeEventListener('storage', handleStorage);
+                if (channel) {
+                    channel.close();
+                }
             }
         }, 1000);
     };

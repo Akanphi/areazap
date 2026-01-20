@@ -129,14 +129,22 @@ export const getGitlabWebhookEvents = async (): Promise<string[]> => {
  */
 
 export interface OAuthCodeSubmission {
-    code: string;
+    id_token?: string;
     state: string;
     provider: string;
 }
 
 export interface OAuthSessionResponse {
-    session_id: string;
+    session_id?: string;
     status?: 'pending' | 'success' | 'error';
+    access?: string;
+    refresh?: string;
+    user?: {
+        id: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+    };
 }
 
 export interface OAuthCredentialsResponse {
@@ -157,7 +165,9 @@ export interface OAuthCredentialsResponse {
  * POST /area_api/auth/oauth/submit/
  */
 export const submitOAuthCode = async (data: OAuthCodeSubmission): Promise<OAuthSessionResponse> => {
-    const response = await api.post<OAuthSessionResponse>(`auth/login/${data.provider}/verify`, data);
+    console.log(`[submitOAuthCode] Submitting to auth/${data.provider}/verify`, data);
+    const response = await api.post<OAuthSessionResponse>(`auth/${data.provider}/verify`, data);
+    console.log(`[submitOAuthCode] Response:`, response.data);
     return response.data;
 };
 
